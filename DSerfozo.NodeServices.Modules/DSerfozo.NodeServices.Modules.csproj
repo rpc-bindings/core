@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Content\Node\init.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Content\Node\init.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DSerfozo.NodeServices.Sockets\DSerfozo.NodeServices.Sockets.csproj" />
+    <ProjectReference Include="..\DSerfozo.NodeServices\DSerfozo.NodeServices.csproj" />
+    <ProjectReference Include="..\DSerfozo.RpcBindings\DSerfozo.RpcBindings.csproj" />
+  </ItemGroup>
+
+</Project>

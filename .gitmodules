@@ -1,0 +1,3 @@
+[submodule "JavaScriptServices"]
+	path = JavaScriptServices
+	url = https://github.com/arsher/JavaScriptServices.git

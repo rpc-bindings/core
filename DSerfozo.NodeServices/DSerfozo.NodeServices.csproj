@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+  </PropertyGroup>
+
+  <!-- <Target Name="GenerateScript" BeforeTargets="Build">
+    <Exec Command="npm install" />
+    <Exec Command="node node_modules/webpack/bin/webpack.js" />
+  </Target> -->
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\JavaScriptServices\src\Microsoft.AspNetCore.NodeServices\INodeServices.cs" Link="INodeServices.cs" />
+    <Compile Include="..\JavaScriptServices\src\Microsoft.AspNetCore.NodeServices\NodeServicesImpl.cs" Link="NodeServicesImpl.cs" />
+    <None Include="..\JavaScriptServices\src\Microsoft.AspNetCore.NodeServices\webpack.config.js" Link="webpack.config.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\JavaScriptServices\src\Microsoft.AspNetCore.NodeServices\Configuration\NodeServicesFactory.cs" LinkBase="Configuration" />
+    <Compile Include="..\JavaScriptServices\src\Microsoft.AspNetCore.NodeServices\HostingModels\**\*.cs" LinkBase="HostingModels" />
+    <Compile Include="..\JavaScriptServices\src\Microsoft.AspNetCore.NodeServices\Util\**\*.cs" LinkBase="Util" />
+    <None Include="..\JavaScriptServices\src\Microsoft.AspNetCore.NodeServices\TypeScript\**\*.*" LinkBase="TypeScript" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Content\Node\entrypoint-http.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Content\Node\entrypoint-http.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.1-beta3" />
+  </ItemGroup>
+</Project>

@@ -3,7 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSerfozo.RpcBindings", "DSerfozo.RpcBindings\DSerfozo.RpcBindings.csproj", "{9B7583D6-D83F-4184-AE30-078F0B46367B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.RpcBindings", "DSerfozo.RpcBindings\DSerfozo.RpcBindings.csproj", "{9B7583D6-D83F-4184-AE30-078F0B46367B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.RpcBindings.Tests", "DSerfozo.RpcBindings.Tests\DSerfozo.RpcBindings.Tests.csproj", "{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.JavaScriptServices.Example", "DSerfozo.JavaScriptServices.Example\DSerfozo.JavaScriptServices.Example.csproj", "{63EFF364-078A-4B05-AA64-BCC67B14CE0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSerfozo.NodeServices", "DSerfozo.NodeServices\DSerfozo.NodeServices.csproj", "{341B3E7D-2453-4C87-B33E-B75805D87178}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSerfozo.NodeServices.Sockets", "DSerfozo.NodeServices.Sockets\DSerfozo.NodeServices.Sockets.csproj", "{422D9BCF-992B-4C73-9832-D1830AE966D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSerfozo.NodeServices.Modules", "DSerfozo.NodeServices.Modules\DSerfozo.NodeServices.Modules.csproj", "{2BA1A469-DC7D-45EE-8CB1-31C87836F250}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSerfozo.NodeServices.Modules.Tests", "DSerfozo.NodeServices.Modules.Tests\DSerfozo.NodeServices.Modules.Tests.csproj", "{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +27,30 @@ Global
 		{9B7583D6-D83F-4184-AE30-078F0B46367B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B7583D6-D83F-4184-AE30-078F0B46367B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B7583D6-D83F-4184-AE30-078F0B46367B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63EFF364-078A-4B05-AA64-BCC67B14CE0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63EFF364-078A-4B05-AA64-BCC67B14CE0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63EFF364-078A-4B05-AA64-BCC67B14CE0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63EFF364-078A-4B05-AA64-BCC67B14CE0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{341B3E7D-2453-4C87-B33E-B75805D87178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{341B3E7D-2453-4C87-B33E-B75805D87178}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{341B3E7D-2453-4C87-B33E-B75805D87178}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{341B3E7D-2453-4C87-B33E-B75805D87178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{422D9BCF-992B-4C73-9832-D1830AE966D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{422D9BCF-992B-4C73-9832-D1830AE966D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{422D9BCF-992B-4C73-9832-D1830AE966D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{422D9BCF-992B-4C73-9832-D1830AE966D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BA1A469-DC7D-45EE-8CB1-31C87836F250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BA1A469-DC7D-45EE-8CB1-31C87836F250}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BA1A469-DC7D-45EE-8CB1-31C87836F250}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BA1A469-DC7D-45EE-8CB1-31C87836F250}.Release|Any CPU.Build.0 = Release|Any CPU
+		{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
