@@ -1,0 +1,11 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+environment:
+  nodejs_version: 8
+install:
+- ps: Install-Product node $env:nodejs_version
+- git submodule update --init --recursive
+before_build:
+- cmd: dotnet restore
+build:
+  verbosity: minimal
