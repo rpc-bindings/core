@@ -5,6 +5,12 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <Target Name="NpmBuild" BeforeTargets="BeforeBuild" Condition="!Exists('$(ProjectDir)node_modules')">
+    <Exec Condition="!Exists('$(ProjectDir)..\..\src\dserfozo-rpcbindings\node_modules')" Command="pushd &quot;$(ProjectDir)..\..\src\dserfozo-rpcbindings&quot; &amp;&amp; npm install &amp;&amp; popd" />
+    <Exec Command="pushd &quot;$(ProjectDir)..\..\src\dserfozo-rpcbindings&quot; &amp;&amp; npm run build &amp;&amp; popd" />
+    <Exec Command="npm install" />
+  </Target>
+
   <ItemGroup>
     <Compile Remove="%2a%2a\**" />
     <EmbeddedResource Remove="%2a%2a\**" />
