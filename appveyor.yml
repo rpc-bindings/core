@@ -28,9 +28,5 @@ install:
 build:
   project: DSerfozo.RpcBindings.sln
   verbosity: minimal
-test:
-  assemblies:
-    only:
-    - DSerfozo.RpcBindings.Tests.dll
-    - DSerfozo.RpcBindings.Json.Tests.dll
-    - DSerfozo.RpcBindings.Node.IntegrationTests.dll  
+test_script:
+- cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Tests\bin\Release\net461\tests\DSerfozo.RpcBindings.Tests.dll'  
