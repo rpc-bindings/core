@@ -1,5 +1,7 @@
 version: 1.0.{build}
 image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
 environment:
   nodejs_version: 8
 install:
@@ -8,4 +10,5 @@ install:
 before_build:
 - cmd: dotnet restore
 build:
+  project: DSerfozo.RpcBindings.sln
   verbosity: minimal
