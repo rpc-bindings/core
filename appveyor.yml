@@ -37,3 +37,9 @@ artifacts:
 - path: src\DSerfozo.RpcBindings\bin\Release\DSerfozo.RpcBindings*.nupkg
 - path: src\DSerfozo.RpcBindings.Json\bin\Release\DSerfozo.RpcBindings.Json*.nupkg
 - path: src\dserfozo-rpcbindings\dserfozo-rpcbindings-*.tgz
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/dserfozo/api/v2/package
+  api_key:
+    secure: uz70X1rDufUiuaV59aw5GKHF6lLvRCe9QkBZQkjGaxwAP/LSuVHdRAdEwRIZhkai
+  skip_symbols: true
