@@ -28,3 +28,9 @@ install:
 build:
   project: DSerfozo.RpcBindings.sln
   verbosity: minimal
+test:
+  assemblies:
+    only:
+    - DSerfozo.RpcBindings.Tests.dll
+    - DSerfozo.RpcBindings.Json.Tests.dll
+    - DSerfozo.RpcBindings.Node.IntegrationTests.dll  
