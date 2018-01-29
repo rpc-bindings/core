@@ -36,7 +36,6 @@ var webpack_opts = {
     },
     externals: [nodeExternals()],
     plugins: [
-        new webpack.optimize.UglifyJsPlugin(),
         new webpack.LoaderOptionsPlugin({
             options: {
                 tslint: {
