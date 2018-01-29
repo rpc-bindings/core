@@ -29,4 +29,4 @@ build:
   project: DSerfozo.RpcBindings.sln
   verbosity: minimal
 test_script:
-- cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Tests\bin\Release\net461\tests\DSerfozo.RpcBindings.Tests.dll'  
+- cmd: '%xunit20%\xunit.console.x86 C:\projects\rpcbindings\tests\DSerfozo.RpcBindings.Tests\bin\Release\net461\tests\DSerfozo.RpcBindings.Tests.dll'  
