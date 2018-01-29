@@ -3,19 +3,31 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.RpcBindings", "DSerfozo.RpcBindings\DSerfozo.RpcBindings.csproj", "{9B7583D6-D83F-4184-AE30-078F0B46367B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.RpcBindings", "src\DSerfozo.RpcBindings\DSerfozo.RpcBindings.csproj", "{9B7583D6-D83F-4184-AE30-078F0B46367B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.RpcBindings.Tests", "DSerfozo.RpcBindings.Tests\DSerfozo.RpcBindings.Tests.csproj", "{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.RpcBindings.Tests", "tests\DSerfozo.RpcBindings.Tests\DSerfozo.RpcBindings.Tests.csproj", "{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.JavaScriptServices.Example", "DSerfozo.JavaScriptServices.Example\DSerfozo.JavaScriptServices.Example.csproj", "{63EFF364-078A-4B05-AA64-BCC67B14CE0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.NodeServices", "tests\DSerfozo.NodeServices\DSerfozo.NodeServices.csproj", "{341B3E7D-2453-4C87-B33E-B75805D87178}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSerfozo.NodeServices", "DSerfozo.NodeServices\DSerfozo.NodeServices.csproj", "{341B3E7D-2453-4C87-B33E-B75805D87178}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.NodeServices.Sockets", "tests\DSerfozo.NodeServices.Sockets\DSerfozo.NodeServices.Sockets.csproj", "{422D9BCF-992B-4C73-9832-D1830AE966D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSerfozo.NodeServices.Sockets", "DSerfozo.NodeServices.Sockets\DSerfozo.NodeServices.Sockets.csproj", "{422D9BCF-992B-4C73-9832-D1830AE966D3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{F783B55D-8CA5-45A8-AC22-A4C5C24D1FC0}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		src\Directory.Build.props = src\Directory.Build.props
+		src\build\key.snk = src\build\key.snk
+		src\version.props = src\version.props
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSerfozo.NodeServices.Modules", "DSerfozo.NodeServices.Modules\DSerfozo.NodeServices.Modules.csproj", "{2BA1A469-DC7D-45EE-8CB1-31C87836F250}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.RpcBindings.Json", "src\DSerfozo.RpcBindings.Json\DSerfozo.RpcBindings.Json.csproj", "{F021DC54-B3BE-4ECB-94B7-A148B789F1E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSerfozo.NodeServices.Modules.Tests", "DSerfozo.NodeServices.Modules.Tests\DSerfozo.NodeServices.Modules.Tests.csproj", "{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.RpcBindings.Json.Tests", "tests\DSerfozo.RpcBindings.Json.Tests\DSerfozo.RpcBindings.Json.Tests.csproj", "{D07CFA72-7FB6-476A-A1A3-5876BBF12728}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8B1F5C30-2D2B-4631-B99F-A15FB1429DB1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BA9588B5-3A47-4360-A6DC-3470120B863D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSerfozo.RpcBindings.Node.IntegrationTests", "tests\DSerfozo.RpcBindings.Node.IntegrationTests\DSerfozo.RpcBindings.Node.IntegrationTests.csproj", "{BF04D446-31A0-412F-A3DB-65D493CF631F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +43,6 @@ Global
 		{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{63EFF364-078A-4B05-AA64-BCC67B14CE0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63EFF364-078A-4B05-AA64-BCC67B14CE0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63EFF364-078A-4B05-AA64-BCC67B14CE0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63EFF364-078A-4B05-AA64-BCC67B14CE0E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{341B3E7D-2453-4C87-B33E-B75805D87178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{341B3E7D-2453-4C87-B33E-B75805D87178}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{341B3E7D-2453-4C87-B33E-B75805D87178}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -43,17 +51,30 @@ Global
 		{422D9BCF-992B-4C73-9832-D1830AE966D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{422D9BCF-992B-4C73-9832-D1830AE966D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{422D9BCF-992B-4C73-9832-D1830AE966D3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2BA1A469-DC7D-45EE-8CB1-31C87836F250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2BA1A469-DC7D-45EE-8CB1-31C87836F250}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2BA1A469-DC7D-45EE-8CB1-31C87836F250}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2BA1A469-DC7D-45EE-8CB1-31C87836F250}.Release|Any CPU.Build.0 = Release|Any CPU
-		{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{435785CB-D20D-4249-ACAB-D89BFB2CB3BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F021DC54-B3BE-4ECB-94B7-A148B789F1E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F021DC54-B3BE-4ECB-94B7-A148B789F1E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F021DC54-B3BE-4ECB-94B7-A148B789F1E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F021DC54-B3BE-4ECB-94B7-A148B789F1E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D07CFA72-7FB6-476A-A1A3-5876BBF12728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D07CFA72-7FB6-476A-A1A3-5876BBF12728}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D07CFA72-7FB6-476A-A1A3-5876BBF12728}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D07CFA72-7FB6-476A-A1A3-5876BBF12728}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF04D446-31A0-412F-A3DB-65D493CF631F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF04D446-31A0-412F-A3DB-65D493CF631F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF04D446-31A0-412F-A3DB-65D493CF631F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF04D446-31A0-412F-A3DB-65D493CF631F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9B7583D6-D83F-4184-AE30-078F0B46367B} = {8B1F5C30-2D2B-4631-B99F-A15FB1429DB1}
+		{61C482AC-65F2-4D3D-AC6C-E091BDB35C4B} = {BA9588B5-3A47-4360-A6DC-3470120B863D}
+		{341B3E7D-2453-4C87-B33E-B75805D87178} = {BA9588B5-3A47-4360-A6DC-3470120B863D}
+		{422D9BCF-992B-4C73-9832-D1830AE966D3} = {BA9588B5-3A47-4360-A6DC-3470120B863D}
+		{F021DC54-B3BE-4ECB-94B7-A148B789F1E3} = {8B1F5C30-2D2B-4631-B99F-A15FB1429DB1}
+		{D07CFA72-7FB6-476A-A1A3-5876BBF12728} = {BA9588B5-3A47-4360-A6DC-3470120B863D}
+		{BF04D446-31A0-412F-A3DB-65D493CF631F} = {BA9588B5-3A47-4360-A6DC-3470120B863D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4788EFF0-E104-4324-9512-190F64CCBECC}

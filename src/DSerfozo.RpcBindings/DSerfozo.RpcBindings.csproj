@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="4.0.0-preview00001" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Communication\" />
+  </ItemGroup>
+
+</Project>

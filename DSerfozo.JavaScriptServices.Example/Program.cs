@@ -1,14 +1,12 @@
-﻿using DSerfozo.NodeServices.Modules;
-using DSerfozo.NodeServices.Modules.Configuration;
-using DSerfozo.RpcBindings.Contract;
-using DSerfozo.RpcBindings.Marshaling;
-using Microsoft.Extensions.Logging.Console;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Json;
+using Newtonsoft.Json;
 
 namespace DSerfozo.JavaScriptServices.Example
 {
@@ -39,22 +37,27 @@ namespace DSerfozo.JavaScriptServices.Example
 
         static async Task MainAsync(string[] args)
         {
-            var options = new ModuleNodeServicesOptions()
-            {
-                ApplicationStoppingToken = CancellationToken.None,
-                ProjectPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                NodeInstanceOutputLogger = new ConsoleLogger("logger", (_, __) => true, false),
-                BoundObjects = new Dictionary<string, object> { { "bound", new BoundObject() }, { "bound2", new BoundObject() } },
-                BuiltInModules = new Dictionary<string, string> { { "testmodule", "exports.do = function(one, two) { return one + two; }" } }
-            };
-            var nodeServices = new ModuleNodeServices(options);
-            await nodeServices.Initialize();
+            //var rpcBindingHost = new JsonRpcBindingHost(new LineDelimitedJsonConnection(new JsonSerializer()
+            //{
+            //    ContractResolver = new ShouldSerializeContractResolver()
+            //}))
 
-            Console.ReadLine();
+            //var options = new ModuleNodeServicesOptions()
+            //{
+            //    ApplicationStoppingToken = CancellationToken.None,
+            //    ProjectPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+            //    NodeInstanceOutputLogger = new ConsoleLogger("logger", (_, __) => true, false),
+            //    BoundObjects = new Dictionary<string, object> { { "bound", new BoundObject() }, { "bound2", new BoundObject() } },
+            //    BuiltInModules = new Dictionary<string, string> { { "testmodule", "exports.do = function(one, two) { return one + two; }" } }
+            //};
+            //var nodeServices = new ModuleNodeServices(options);
+            //await nodeServices.Initialize();
 
-            Console.WriteLine(await nodeServices.InvokeExportAsync<string>("test", "doIt"));
+            //Console.ReadLine();
 
-            Console.ReadLine();
+            //Console.WriteLine(await nodeServices.InvokeExportAsync<string>("test", "doIt"));
+
+            //Console.ReadLine();
         }
     }
 }

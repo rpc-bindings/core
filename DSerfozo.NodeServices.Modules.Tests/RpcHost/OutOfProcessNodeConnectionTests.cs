@@ -1,5 +1,5 @@
 ﻿using DSerfozo.NodeServices.Modules.RpcHost;
-using DSerfozo.RpcBindings.Model;
+//using DSerfozo.RpcBindings.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;

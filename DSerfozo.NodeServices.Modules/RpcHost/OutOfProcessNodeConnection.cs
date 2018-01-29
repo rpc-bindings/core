@@ -1,5 +1,4 @@
-﻿using DSerfozo.RpcBindings.Communication;
-using DSerfozo.RpcBindings.Contract;
+﻿using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -7,6 +6,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using DSerfozo.RpcBindings.Contract.Communication.Model;
 
 namespace DSerfozo.NodeServices.Modules.RpcHost
 {

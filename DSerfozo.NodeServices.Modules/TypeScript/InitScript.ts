@@ -100,6 +100,19 @@ function createObjectBindings(bindings: Map<number, ObjectDescriptor>) {
     }
 }
 
+function sendCallbackResult(id: number, success: boolean, result: any, error: string) {
+    stream.write(JSON.stringify(
+        {
+            callbackResult: {
+                id: id,
+                success: success,
+                result: result,
+                error: error
+            }
+        }));
+    stream.write('\n');
+}
+
 function bindingMessageArrived(line: string) {
     console.log("RESULT: " + line);
 
@@ -128,48 +141,16 @@ function bindingMessageArrived(line: string) {
                 //promise
                 if (callbackResult && typeof callbackResult.then === 'function') {
                     callbackResult.then(function (result) {
-                        stream.write(JSON.stringify(
-                            {
-                                callbackResult: {
-                                    id: callbackId,
-                                    success: true,
-                                    result: result
-                                }
-                            }));
-                        stream.write('\n');
+                        sendCallbackResult(callbackId, true, result, null);
                     }, function (error) {
-                        stream.write(JSON.stringify(
-                            {
-                                callbackResult: {
-                                    id: callbackId,
-                                    success: false,
-                                    error: error
-                                }
-                            }));
-                        stream.write('\n');
+                        sendCallbackResult(callbackId, false, null, error);
                     });
                 } else {
-                    stream.write(JSON.stringify(
-                        {
-                            callbackResult: {
-                                id: callbackId,
-                                success: true,
-                                result: callbackResult
-                            }
-                        }));
-                    stream.write('\n');
+                    sendCallbackResult(callbackId, true, callbackResult, null);
                 }
             }
             catch (e) {
-                stream.write(JSON.stringify(
-                    {
-                        callbackResult: {
-                            id: callbackId,
-                            success: false,
-                            error: ''
-                        }
-                    }));
-                stream.write('\n');
+                sendCallbackResult(callbackId, false, null, e.toString());
             }
         }
 
