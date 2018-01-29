@@ -36,3 +36,4 @@ test_script:
 artifacts:
 - path: src\DSerfozo.RpcBindings\bin\Release\DSerfozo.RpcBindings*.nupkg
 - path: src\DSerfozo.RpcBindings.Json\bin\Release\DSerfozo.RpcBindings.Json*.nupkg
+- path: src\dserfozo-rpcbindings\dserfozo-rpcbindings-*.tgz
