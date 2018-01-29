@@ -1,9 +1,10 @@
-version: 1.0.{build}
+version: 0.1.{build}
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
 environment:
   nodejs_version: 8
+  BuildNumber: '{build}'
 install:
 - ps: Install-Product node $env:nodejs_version
 - git submodule update --init --recursive
@@ -27,6 +28,7 @@ install:
     dotnet restore
 build:
   project: DSerfozo.RpcBindings.sln
+  publish_nuget: true
   verbosity: minimal
 test_script:
 - cmd: 'cd src\dserfozo-rpcbindings && npm run test'
