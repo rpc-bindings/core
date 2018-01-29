@@ -7,8 +7,16 @@ environment:
 install:
 - ps: Install-Product node $env:nodejs_version
 - git submodule update --init --recursive
-before_build:
-- cmd: dotnet restore
+- cmd: >-
+    pushd src\dserfozo-rpcbindings
+    npm run build
+    popd
+
+    pushd tests\DSerfozo.RpcBindings.Node.IntegrationTests
+    npm install
+    popd
+
+    dotnet restore
 build:
   project: DSerfozo.RpcBindings.sln
   verbosity: minimal
