@@ -30,3 +30,5 @@ build:
   verbosity: minimal
 test_script:
 - cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Tests\bin\Release\net461\DSerfozo.RpcBindings.Tests.dll'  
+- cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Json.Tests\bin\Release\net461\DSerfozo.RpcBindings.Json.Tests.dll'
+- cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Node.IntegrationTests\bin\Release\net461\DSerfozo.RpcBindings.Node.IntegrationTests.dll'
