@@ -4,7 +4,6 @@ configuration: Release
 platform: Any CPU
 environment:
   nodejs_version: 8
-  BuildNumber: '{build}'
 install:
 - ps: Install-Product node $env:nodejs_version
 - git submodule update --init --recursive
@@ -26,10 +25,8 @@ install:
 
 
     dotnet restore
-build:
-  project: DSerfozo.RpcBindings.sln
-  publish_nuget: true
-  verbosity: minimal
+build_script:
+- cmd: msbuild DSerfozo.RpcBindings.sln /t:Build /p:Configuration=Release /p:BuildNumber=%APPVEYOR_BUILD_NUMBER%
 test_script:
 - cmd: 'cd src\dserfozo-rpcbindings && npm run test'
 - cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Tests\bin\Release\net461\DSerfozo.RpcBindings.Tests.dll'  
