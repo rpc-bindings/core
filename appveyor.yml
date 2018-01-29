@@ -26,7 +26,7 @@ install:
 
     dotnet restore
 build_script:
-- cmd: msbuild DSerfozo.RpcBindings.sln /t:Build /p:Configuration=Release /p:BuildNumber=%APPVEYOR_BUILD_NUMBER%
+- cmd: msbuild DSerfozo.RpcBindings.sln /t:Build;Pack /p:Configuration=Release /p:BuildNumber=%APPVEYOR_BUILD_NUMBER% /p:ProjectOutputPath=%cd%\dist
 test_script:
 - cmd: 'cd src\dserfozo-rpcbindings && npm run test'
 - cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Tests\bin\Release\net461\DSerfozo.RpcBindings.Tests.dll'  
