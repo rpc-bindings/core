@@ -33,5 +33,5 @@ test_script:
 - cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Json.Tests\bin\Release\net461\DSerfozo.RpcBindings.Json.Tests.dll'
 - cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Node.IntegrationTests\bin\Release\net461\DSerfozo.RpcBindings.Node.IntegrationTests.dll'
 artifacts:
-- path: dist\DSerfozo.RpcBindings.nupkg
-- path: dist\DSerfozo.RpcBindings.Json.nupkg
+- path: dist\DSerfozo.RpcBindings*.nupkg
+- path: dist\DSerfozo.RpcBindings.Json*.nupkg
