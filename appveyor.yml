@@ -10,8 +10,10 @@ install:
 - cmd: >-
     pushd src\dserfozo-rpcbindings
 
+    npm install
+
     npm run build
-    
+
     popd
 
 
