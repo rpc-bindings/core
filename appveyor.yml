@@ -4,6 +4,8 @@ configuration: Release
 platform: Any CPU
 environment:
   nodejs_version: 8
+  npm_key:
+    secure: uz70X1rDufUiuaV59aw5GKHF6lLvRCe9QkBZQkjGaxwAP/LSuVHdRAdEwRIZhkai
 install:
 - ps: Install-Product node $env:nodejs_version
 - git submodule update --init --recursive
@@ -43,3 +45,13 @@ deploy:
   api_key:
     secure: uz70X1rDufUiuaV59aw5GKHF6lLvRCe9QkBZQkjGaxwAP/LSuVHdRAdEwRIZhkai
   skip_symbols: true
+deploy_script:
+  - ps: |
+      if ($ENV:CONFIGURATION -eq "publish")
+      {
+        pushd src\dserfozo-rpcbindings
+        "//www.myget.org/F/dserfozo/npm/:_authToken=`$`{npm_key`}" | Out-File (Join-Path $ENV:APPVEYOR_BUILD_FOLDER ".npmrc") -Encoding UTF8
+        iex "npm publish"
+      }
+    on:
+      branch: master  
