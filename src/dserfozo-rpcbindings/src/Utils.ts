@@ -1,4 +1,4 @@
-export function buildMapStringKey<V>(obj: any) : Map<number, V> {
+export function buildMapStringKey<V>(obj: any) : Map<string, V> {
     return Object.keys(obj).reduce((m, k) => m.set(k, obj[k]), new Map());
 }
 
