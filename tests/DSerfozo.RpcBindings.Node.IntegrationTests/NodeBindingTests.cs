@@ -49,15 +49,11 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
             options.UseSocketHosting();
             nodeServices = NodeServicesFactory.CreateNodeServices(options);
 
-            connection = new LineDelimitedJsonConnection(new JsonSerializer()
-            {
-                ContractResolver = new ShouldSerializeContractResolver()
-            });
-            rpcHost = new JsonRpcBindingHost(connection);
+            rpcHost = new JsonRpcBindingHost(js => new LineDelimitedJsonConnection(js));
             rpcHost.Repository.AddBinding("test", new TestBound());
 
             var initTask = nodeServices.InvokeExportAsync<Stream>("binding-init", "initialize", rpcHost.Repository.Objects);
-            this.initTask = initTask.ContinueWith(t => connection.Initialize(t.Result, t.Result));
+            this.initTask = initTask.ContinueWith(t => (rpcHost.Connection as LineDelimitedJsonConnection)?.Initialize(t.Result, t.Result));
 
         }
 

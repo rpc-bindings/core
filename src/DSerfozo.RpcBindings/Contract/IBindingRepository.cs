@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings.Contract
 {
-    public interface IBindingRepository
+    public interface IBindingRepository : IDisposable
     {
         IReadOnlyDictionary<int, ObjectDescriptor> Objects { get; }
 

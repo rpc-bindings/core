@@ -19,6 +19,11 @@ namespace DSerfozo.RpcBindings.Json
 
         public event Action<RpcResponse<JToken>> RpcResponse;
 
+        public static IConnection<JToken> Create(JsonSerializer jsonSerializer)
+        {
+            return new LineDelimitedJsonConnection(jsonSerializer);
+        }
+
         public LineDelimitedJsonConnection(JsonSerializer jsonSerializer)
         {
             this.jsonSerializer = jsonSerializer;
