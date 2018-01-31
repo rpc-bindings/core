@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DSerfozo.RpcBindings.Analyze;
 using DSerfozo.RpcBindings.Contract;
@@ -11,21 +12,25 @@ using Newtonsoft.Json.Linq;
 
 namespace DSerfozo.RpcBindings.Json
 {
-    public class JsonRpcBindingHost
+    public class JsonRpcBindingHost : IDisposable
     {
         private readonly JsonSerializer jsonSerializer = new JsonSerializer()
         {
             ContractResolver = new ShouldSerializeContractResolver()
         };
+        private readonly CompositeDisposable disposables = new CompositeDisposable();
         private readonly IConnection<JToken> connection;
         private readonly IBindingRepository bindingRepository;
         private readonly IMethodExecutor<JToken> methodExecutor;
+        private bool disposed;
+
+        public IConnection<JToken> Connection => connection;
 
         public IBindingRepository Repository => bindingRepository;
 
-        public JsonRpcBindingHost(IConnection<JToken> connection)
+        public JsonRpcBindingHost(Func<JsonSerializer, IConnection<JToken>> connectionFactory)
         {
-            this.connection = connection;
+            connection = connectionFactory(jsonSerializer);
 
             var incomingMessages = Observable.FromEvent<Action<RpcResponse<JToken>>, RpcResponse<JToken>>(handler => connection.RpcResponse += handler, handler => connection.RpcResponse -= handler); 
 
@@ -35,9 +40,9 @@ namespace DSerfozo.RpcBindings.Json
             IParameterBinder<JToken> parameterBinder = new JsonBinder(jsonSerializer, callbackFactory);
             methodExecutor = new MethodExecutor<JToken>(bindingRepository.Objects, parameterBinder);
 
-            callbackExecutor.Subscribe<DeleteCallback>(OnDeleteCallback);
-            callbackExecutor.Subscribe<CallbackExecution<JToken>>(OnCallbackExecution);
-            incomingMessages.Select(m => m.MethodExecution).Where(m => m != null).Subscribe(OnMethodExecution);
+            disposables.Add(callbackExecutor.Subscribe<DeleteCallback>(OnDeleteCallback));
+            disposables.Add(callbackExecutor.Subscribe<CallbackExecution<JToken>>(OnCallbackExecution));
+            disposables.Add(incomingMessages.Select(m => m.MethodExecution).Where(m => m != null).Subscribe(OnMethodExecution));
         }
 
         private async void OnCallbackExecution(CallbackExecution<JToken> callbackExecution)
@@ -55,6 +60,17 @@ namespace DSerfozo.RpcBindings.Json
             var result = await methodExecutor.Execute(methodExecution);
 
             await connection.Send(new RpcRequest<JToken>() { MethodResult = result }).ConfigureAwait(false);
+        }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                disposables.Dispose();
+                bindingRepository.Dispose();
+
+                disposed = true;
+            }
         }
     }
 }
