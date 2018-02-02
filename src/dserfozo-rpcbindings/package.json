@@ -15,6 +15,7 @@
   "scripts": {
     "test": "jest",
     "build": "webpack",
+    "set-buildnum": "set VERSION=node -p -e \"require('./package.json').version\" && npm version \"%VERSION%-pre.%APPVEYOR_BUILD_NUMBER%\"",
     "release": "standard-version && npm pack"
   },
   "devDependencies": {

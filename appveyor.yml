@@ -14,6 +14,8 @@ install:
 
     npm install
 
+    npm run set-buildnum
+
     npm run build
 
     cd ..\..
