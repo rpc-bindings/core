@@ -2,6 +2,8 @@
   <PropertyGroup>
     <PackageVersion>0.0.2</PackageVersion>
     <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
+    <VersionSuffix></VersionSuffix>
     <VersionSuffix Condition="'$(IsRtm)' != 'true' And '$(BuildNumber)' != ''">pre-$(BuildNumber)</VersionSuffix>
+    <PackageVersion Condition="'$(VersionSuffix)' != ''">0.0.2-$(VersionSuffix)</PackageVersion>
   </PropertyGroup>
 </Project>

@@ -49,11 +49,8 @@ deploy:
   skip_symbols: true
 deploy_script:
   - ps: |
-      if ($ENV:CONFIGURATION -eq "publish")
-      {
         pushd src\dserfozo-rpcbindings
         "//www.myget.org/F/dserfozo/npm/:_authToken=`$`{npm_key`}" | Out-File (Join-Path $ENV:APPVEYOR_BUILD_FOLDER ".npmrc") -Encoding UTF8
         iex "npm publish"
-      }
     on:
       branch: master  
