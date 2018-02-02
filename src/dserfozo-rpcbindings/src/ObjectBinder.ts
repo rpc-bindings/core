@@ -19,8 +19,13 @@ export class ObjectBinder {
     }
 
     bind(rootObject: any): void {
-        rootObject[this.objectDescriptor.name] = {};
+        const namespace = this.objectDescriptor.name.split('.');
 
-        this.functions.forEach(e => e.bind(rootObject[this.objectDescriptor.name]));
+        let context = rootObject;
+        for (var i = 0; i < namespace.length; i++) {
+            context = context[namespace[i]] ? context[namespace[i]] : (context[namespace[i]] = {});
+        }
+
+        this.functions.forEach(e => e.bind(context));
     }
 }

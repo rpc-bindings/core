@@ -30,4 +30,12 @@ describe('ObjectBinder', () => {
 
         expect(obj.objName.testFunc.boundObject).toBeInstanceOf(FunctionBinder);
     });
+
+    it('Should create nested bound object', () => {
+        const binder = new ObjectBinder(<any>{id:1, name:'namespace1.namespace2.objName', methods:[]}, <any>{}, <any>{}, <any>{});
+        const obj = {};
+        binder.bind(obj);
+
+        expect(typeof obj.namespace1.namespace2.objName).toBe('object');
+    });
 });
