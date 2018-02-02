@@ -14,7 +14,7 @@ install:
 
     npm install
 
-    npm run set-buildnum
+    npm run set-buildnum %APPVEYOR_BUILD_NUMBER%
 
     npm run build
 
