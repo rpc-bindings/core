@@ -1,5 +1,5 @@
 import { BindingConnection } from './BindingConnection';
-import { CallbackExecution, DeleteCallback, MethodResult, CallbackResult } from './RpcRequest';
+import { CallbackExecution, DeleteCallback, MethodResult, CallbackResult, PropertyGetSetResult } from './RpcRequest';
 import { ObjectDescriptor, MethodDescriptor } from './ObjectDescriptor';
 import { ObjectBinder} from './ObjectBinder';
 import { Registry } from './Registry';
@@ -7,6 +7,7 @@ import { SavedCall } from './SavedCall';
 
 export class Binder {
     private readonly callRegistry = new Registry<SavedCall>();
+    private readonly propertyExecutionRegistry = new Registry<SavedCall>();
     private readonly callbackRegistry = new Registry<(...args: any[]) => any>();
     private readonly boundObjects = new Map<number, ObjectBinder>();
 
@@ -14,9 +15,10 @@ export class Binder {
         connection.on(BindingConnection.CALLBACK_EXECUTION, this.onCallbackExecution.bind(this));
         connection.on(BindingConnection.DELETE_CALLBACK, this.onDeleteCallback.bind(this));
         connection.on(BindingConnection.METHOD_RESULT, this.onMethodResult.bind(this));
+        connection.on(BindingConnection.PROPERTY_RESULT, this.onPropertyResult.bind(this));
 
         objectDescriptors.forEach((function (elem) {
-            this.boundObjects.set(elem.id, new ObjectBinder(elem, connection, this.callRegistry, this.callbackRegistry))
+            this.boundObjects.set(elem.id, new ObjectBinder(elem, connection, this.callRegistry, this.propertyExecutionRegistry, this.callbackRegistry))
         }).bind(this));
     }
 
@@ -57,6 +59,19 @@ export class Binder {
 
             if(result.success) {
                 execution.resolve(result.result);
+            } else {
+                execution.reject(result.error);
+            }
+        }
+    }
+
+    private onPropertyResult(result: PropertyGetSetResult) : void {
+        const execution = this.propertyExecutionRegistry.get(result.executionId);
+        if(execution) {
+            this.propertyExecutionRegistry.delete(result.executionId);
+
+            if(result.success) {
+                execution.resolve(result.value);
             } else {
                 execution.reject(result.error);
             }

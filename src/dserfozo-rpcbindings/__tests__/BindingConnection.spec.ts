@@ -38,6 +38,16 @@ describe('BindingConnection', () => {
         expect(handler).toBeCalledWith({ functionId: 1 });
     });
 
+    it('Should report property result', () => {
+        const handler = jest.fn();
+        const connection = new BindingConnection(null);
+        connection.on(BindingConnection.PROPERTY_RESULT, handler);
+
+        require('readline').__sendLine('{"propertyResult":{"executionId":1}}');
+
+        expect(handler).toBeCalledWith({ executionId: 1 });
+    });
+
     it('Should write callback result', () => {
         let strContent = '';
         const connection = new BindingConnection(<any>{
@@ -62,5 +72,31 @@ describe('BindingConnection', () => {
         connection.sendMethodExecution(<any>{ methodId: 1, objectId: 2 });
 
         expect(strContent).toBe('{"methodExecution":{"methodId":1,"objectId":2}}\n');
+    });
+
+    it('Should write property get execution', () => {
+        let strContent = '';
+        const connection = new BindingConnection(<any>{
+            write(data) {
+                strContent += data;
+            }
+        });
+
+        connection.sendPropertyGetExecution(<any>{ propertyId: 1, objectId: 2 });
+
+        expect(strContent).toBe('{"propertyGet":{"propertyId":1,"objectId":2}}\n');
+    });
+
+    it('Should write property set execution', () => {
+        let strContent = '';
+        const connection = new BindingConnection(<any>{
+            write(data) {
+                strContent += data;
+            }
+        });
+
+        connection.sendPropertySetExecution(<any>{ propertyId: 1, objectId: 2, value: {} });
+
+        expect(strContent).toBe('{"propertySet":{"propertyId":1,"objectId":2,"value":{}}}\n');
     });
 });

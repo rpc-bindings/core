@@ -22,6 +22,27 @@ export interface MethodExecution {
     parameters: any[];
 }
 
+export interface PropertyGetExecution {
+    executionId: number;
+    propertyId: number;
+    objectId: number;
+
+}
+
+export interface PropertySetExecution {
+    executionId: number;
+    propertyId: number;
+    objectId: number;
+    value: any;
+}
+
+export interface PropertyGetSetResult {
+    executionId: number;
+    success: boolean;
+    error: string;
+    value: any;
+}
+
 export interface CallbackResult {
     executionId: number;
     success: boolean;
@@ -33,9 +54,12 @@ export interface RpcRequest {
     callbackExecution: CallbackExecution;
     methodResult: MethodResult;
     deleteCallback: DeleteCallback;
+    propertyResult: PropertyGetSetResult;
 }
 
 export interface RpcResponse {
     methodExecution: MethodExecution;
+    propertyGet: PropertyGetExecution;
+    propertySet: PropertySetExecution;
     callbackResult:CallbackResult;
 }
