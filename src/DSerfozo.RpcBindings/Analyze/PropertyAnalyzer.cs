@@ -28,6 +28,7 @@ namespace DSerfozo.RpcBindings.Analyze
                     .WithReadOnly(IsReadOnly(propertyInfo))
                     .WithGetter(o => propertyInfo.GetValue(o))
                     .WithSetter((o, v) => propertyInfo.SetValue(o, v))
+                    .WithType(propertyInfo.PropertyType)
                     .Get();
             }
         }

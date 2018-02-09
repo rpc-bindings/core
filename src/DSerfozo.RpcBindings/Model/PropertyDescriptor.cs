@@ -7,7 +7,11 @@ namespace DSerfozo.RpcBindings.Model
     {
         public sealed class Builder
         {
-            private readonly PropertyDescriptor constructed = new PropertyDescriptor();
+            private readonly PropertyDescriptor constructed = new PropertyDescriptor()
+            {
+                Readable = true,
+                Writable = true
+            };
 
             public Builder WithId(int id)
             {
@@ -35,7 +39,13 @@ namespace DSerfozo.RpcBindings.Model
 
             public Builder WithReadOnly(bool readOnly)
             {
-                constructed.IsReadOnly = readOnly;
+                constructed.Writable = !readOnly;
+                return this;
+            }
+
+            public Builder WithType(Type type)
+            {
+                constructed.Type = type;
                 return this;
             }
 
@@ -52,11 +62,16 @@ namespace DSerfozo.RpcBindings.Model
         public string Name { get; private set; }
 
         [ShouldSerialize]
-        public bool IsReadOnly { get; private set; }
+        public bool Readable { get; private set; }
+
+        [ShouldSerialize]
+        public bool Writable { get; private set; }
 
         public Func<object, object> Getter { get; private set; }
 
         public Action<object, object> Setter { get; private set; }
+
+        public Type Type { get; private set; }
 
         private PropertyDescriptor()
         {

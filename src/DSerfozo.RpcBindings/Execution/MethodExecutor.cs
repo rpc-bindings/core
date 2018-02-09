@@ -22,14 +22,12 @@ namespace DSerfozo.RpcBindings.Execution
 
         public async Task<MethodResult> Execute(MethodExecution<TMarshal> methodExcecution)
         {
-            ObjectDescriptor objectDescriptor;
-            if(!objects.TryGetValue(methodExcecution.ObjectId, out objectDescriptor))
+            if(!objects.TryGetValue(methodExcecution.ObjectId, out var objectDescriptor))
             {
                 throw new InvalidOperationException("");
             }
 
-            MethodDescriptor methodDescriptor;
-            if(!objectDescriptor.Methods.TryGetValue(methodExcecution.MethodId, out methodDescriptor))
+            if(!objectDescriptor.Methods.TryGetValue(methodExcecution.MethodId, out var methodDescriptor))
             {
                 throw new InvalidOperationException("");
             }

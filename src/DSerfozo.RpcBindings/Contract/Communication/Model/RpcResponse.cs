@@ -9,5 +9,11 @@ namespace DSerfozo.RpcBindings.Contract.Communication.Model
 
         [ShouldSerialize]
         public CallbackResult<TMarshal> CallbackResult { get; set; }
+
+        [ShouldSerialize]
+        public PropertyGetExecution PropertyGet { get; set; }
+
+        [ShouldSerialize]
+        public PropertySetExecution<TMarshal> PropertySet { get; set; }
     }
 }

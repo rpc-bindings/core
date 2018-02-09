@@ -12,5 +12,8 @@ namespace DSerfozo.RpcBindings.Contract.Communication.Model
 
         [ShouldSerialize]
         public DeleteCallback DeleteCallback { get; set; }
+
+        [ShouldSerialize]
+        public PropertyGetSetResult<TMarshal> PropertyResult { get; set; }
     }
 }

@@ -74,5 +74,27 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
 
             Assert.Collection(descriptor.Methods, m => Assert.True(m.Key == 1 && m.Value.Id == 1));
         }
+
+        [Fact]
+        public void PropertiesSetOnObjectDescriptor()
+        {
+            const int Id = 1;
+            const string Name = "name";
+
+            var idGeneratorMock = new Mock<IIdGenerator>();
+            idGeneratorMock.Setup(_ => _.GetNextId()).Returns(Id);
+            var propertyAnalyzer = Mock.Of<IPropertyAnalyzer>();
+            var propertyAnalyzerMock = Mock.Get(propertyAnalyzer);
+            List<PropertyDescriptor> value = new List<PropertyDescriptor>()
+            {
+                PropertyDescriptor.Create().WithId(1).Get()
+            };
+            propertyAnalyzerMock.Setup(_ => _.AnalyzeProperties(It.IsAny<Type>())).Returns(value);
+
+            var objectAnalyzer = new ObjectAnalyzer(idGeneratorMock.Object, propertyAnalyzer, Mock.Of<IMethodAnalyzer>());
+            var descriptor = objectAnalyzer.AnalyzeObject(Name, new SimpleClassWithPrimitiveProperties("str"));
+
+            Assert.Collection(descriptor.Properties, m => Assert.True(m.Key == 1 && m.Value.Id == 1));
+        }
     }
 }

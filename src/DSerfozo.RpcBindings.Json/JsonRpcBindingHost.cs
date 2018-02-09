@@ -22,6 +22,7 @@ namespace DSerfozo.RpcBindings.Json
         private readonly IConnection<JToken> connection;
         private readonly IBindingRepository bindingRepository;
         private readonly IMethodExecutor<JToken> methodExecutor;
+        private readonly IPropertyExecutor<JToken> propertyExecutor;
         private bool disposed;
 
         public IConnection<JToken> Connection => connection;
@@ -39,10 +40,27 @@ namespace DSerfozo.RpcBindings.Json
             ICallbackFactory<JToken> callbackFactory = new CallbackFactory<JToken>(callbackExecutor);
             IParameterBinder<JToken> parameterBinder = new JsonBinder(jsonSerializer, callbackFactory);
             methodExecutor = new MethodExecutor<JToken>(bindingRepository.Objects, parameterBinder);
+            propertyExecutor = new PropertyExecutor<JToken>(bindingRepository.Objects, parameterBinder);
 
             disposables.Add(callbackExecutor.Subscribe<DeleteCallback>(OnDeleteCallback));
             disposables.Add(callbackExecutor.Subscribe<CallbackExecution<JToken>>(OnCallbackExecution));
             disposables.Add(incomingMessages.Select(m => m.MethodExecution).Where(m => m != null).Subscribe(OnMethodExecution));
+            disposables.Add(incomingMessages.Select(m => m.PropertyGet).Where(m => m != null).Subscribe(OnPropertyGetExecution));
+            disposables.Add(incomingMessages.Select(m => m.PropertySet).Where(m => m != null).Subscribe(OnPropertySetExecution));
+        }
+
+        private void OnPropertyGetExecution(PropertyGetExecution propertyGetExecution)
+        {
+            var result = propertyExecutor.Execute(propertyGetExecution);
+
+            connection.Send(new RpcRequest<JToken>() {PropertyResult = result});
+        }
+
+        private void OnPropertySetExecution(PropertySetExecution<JToken> propertySetExecution)
+        {
+            var result = propertyExecutor.Execute(propertySetExecution);
+
+            connection.Send(new RpcRequest<JToken>() { PropertyResult = result });
         }
 
         private async void OnCallbackExecution(CallbackExecution<JToken> callbackExecution)

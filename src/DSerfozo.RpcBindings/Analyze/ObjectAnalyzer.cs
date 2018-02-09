@@ -21,6 +21,7 @@ namespace DSerfozo.RpcBindings.Analyze
             return ObjectDescriptor.Create()
                 .WithId(idGenerator.GetNextId())
                 .WithMethods(methodAnalyzer.AnalyzeMethods(typeof(TObject)))
+                .WithProperties(propertyAnalyzer.AnalyzeProperties(typeof(TObject)))
                 .WithObject(o)
                 .WithName(name)
                 .Get();
@@ -28,9 +29,11 @@ namespace DSerfozo.RpcBindings.Analyze
 
         public ObjectDescriptor AnalyzeObject(string name, object o)
         {
+            var type = o.GetType();
             return ObjectDescriptor.Create()
                 .WithId(idGenerator.GetNextId())
-                .WithMethods(methodAnalyzer.AnalyzeMethods(o.GetType()))
+                .WithMethods(methodAnalyzer.AnalyzeMethods(type))
+                .WithProperties(propertyAnalyzer.AnalyzeProperties(type))
                 .WithObject(o)
                 .WithName(name)
                 .Get();

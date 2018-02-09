@@ -36,7 +36,7 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
             PropertyAnalyzer propertyAnalyzer = new PropertyAnalyzer(new IntIdGenerator(), new IdentityNameGenerator());
             var actual = propertyAnalyzer.AnalyzeProperties(typeof(SimpleClassWithPrimitiveProperties)).ToList();
 
-            Assert.True(actual.Single(f => f.Name == nameof(SimpleClassWithPrimitiveProperties.StringProperty)).IsReadOnly);
+            Assert.False(actual.Single(f => f.Name == nameof(SimpleClassWithPrimitiveProperties.StringProperty)).Writable);
         }
 
         [Fact]

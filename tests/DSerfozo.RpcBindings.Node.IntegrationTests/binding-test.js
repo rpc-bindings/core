@@ -10,3 +10,16 @@ exports.delegateTest = async function (callback) {
 
     callback(null, result);
 }
+
+exports.testProp = async function (callback, input) {
+    try {
+        test.testProp = input + "1";
+        test.testProp = input + "2";
+
+        const getResult = await test.testProp;
+
+        callback(null, getResult);
+    } catch (e) {
+        callback(e.toString(), null);
+    }
+}

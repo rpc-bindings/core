@@ -10,8 +10,4 @@
     <PackageReference Include="System.Reactive" Version="4.0.0-preview00001" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Communication\" />
-  </ItemGroup>
-
 </Project>

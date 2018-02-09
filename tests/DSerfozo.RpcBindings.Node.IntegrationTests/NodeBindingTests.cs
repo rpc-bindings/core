@@ -25,6 +25,18 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
 
         public class TestBound
         {
+            private string testProp;
+
+            public string TestProp
+            {
+                get { return testProp; }
+                set
+                {
+                    Thread.Sleep(1000);
+                    testProp = value;
+                }
+            }
+
             public int TestMethod1(int input)
             {
                 return input+1;
@@ -65,6 +77,16 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
             var result = await nodeServices.InvokeExportAsync<int>("binding-test", "testMethod1", 2);
 
             Assert.Equal(3, result);
+        }
+
+        [Fact]
+        public async Task PropertyWorks()
+        {
+            await initTask;
+
+            var result = await nodeServices.InvokeExportAsync<string>("binding-test", "testProp", "in");
+
+            Assert.Equal("in2", result);
         }
 
         [Fact]
