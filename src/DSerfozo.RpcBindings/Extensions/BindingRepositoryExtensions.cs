@@ -18,14 +18,24 @@ namespace DSerfozo.RpcBindings.Extensions
                 this.wrapped = wrapped;
             }
 
-            public void AddBinding<TObject>(string key, TObject obj)
+            public ObjectDescriptor AddBinding<TObject>(string key, TObject obj)
             {
                 throw new InvalidOperationException("This instance is read-only.");
             }
 
-            public void AddBinding(string key, object obj)
+            public ObjectDescriptor AddBinding(string key, object obj)
             {
                 throw new InvalidOperationException("This instance is read-only.");
+            }
+
+            public ObjectDescriptor AddDisposableBinding(string key, IDisposable obj)
+            {
+                throw new InvalidOperationException("This instance is read-only.");
+            }
+
+            public bool TryGetObjectByName(string name, out ObjectDescriptor objectDescriptor)
+            {
+                return wrapped.TryGetObjectByName(name, out objectDescriptor);
             }
 
             public void Dispose()

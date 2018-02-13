@@ -48,6 +48,29 @@ describe('BindingConnection', () => {
         expect(handler).toBeCalledWith({ executionId: 1 });
     });
 
+    it('Should report dynamic object response', () => {
+        const handler = jest.fn();
+        const connection = new BindingConnection(null);
+        connection.on(BindingConnection.DYNAMIC_OBJECT_RESULT, handler);
+
+        require('readline').__sendLine('{"dynamicObjectResult":{"executionId":1}}');
+
+        expect(handler).toBeCalledWith({ executionId: 1 });
+    });
+
+    it('Should write dynamic object request', () => {
+        let strContent = '';
+        const connection = new BindingConnection({
+            write(data) {
+                strContent += data;
+            },
+        } as any);
+
+        connection.sendDynamicObjectRequeset({ executionId: 1 } as any);
+
+        expect(strContent).toBe('{"dynamicObjectRequest":{"executionId":1}}\n');
+    });
+
     it('Should write callback result', () => {
         let strContent = '';
         const connection = new BindingConnection(<any>{

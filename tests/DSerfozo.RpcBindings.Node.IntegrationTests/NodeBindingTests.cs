@@ -55,7 +55,7 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
                 ApplicationStoppingToken = stopTokenSource.Token,
                 ProjectPath = AppDomain.CurrentDomain.BaseDirectory,
                 NodeInstanceOutputLogger = Mock.Of<ILogger>(),
-                //DebuggingPort = 8989,
+                //DebuggingPort = 9000,
                 //LaunchWithDebugging = true
             };
             options.UseSocketHosting();
@@ -77,6 +77,27 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
             var result = await nodeServices.InvokeExportAsync<int>("binding-test", "testMethod1", 2);
 
             Assert.Equal(3, result);
+        }
+
+        [Fact]
+        public async Task DynamicObjectMethodCallWorks()
+        {
+            await initTask;
+
+            rpcHost.ResolvingBoundObject += args =>
+            {
+                if (args.Name == "testObj")
+                {
+                    args.Disposable = false;
+                    args.Object = new TestBound();
+                }
+
+                return Task.CompletedTask;
+            };
+
+            var result = await nodeServices.InvokeExportAsync<int>("binding-test", "dynamic", 3);
+
+            Assert.Equal(4, result);
         }
 
         [Fact]

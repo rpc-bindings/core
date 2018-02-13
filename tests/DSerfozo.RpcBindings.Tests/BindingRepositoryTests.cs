@@ -23,11 +23,25 @@ namespace DSerfozo.RpcBindings.Tests
             var testClass = new TestClass();
             using (var br = new BindingRepository(Mock.Of<IIdGenerator>()))
             {
-                br.AddBinding("test", testClass);
+                br.AddDisposableBinding("test", testClass);
             }
 
             Assert.True(testClass.Disposed);
         }
+
+
+        [Fact]
+        public void NonDisposableBoundObjectsKept()
+        {
+            var testClass = new TestClass();
+            using (var br = new BindingRepository(Mock.Of<IIdGenerator>()))
+            {
+                br.AddBinding("test", testClass);
+            }
+
+            Assert.False(testClass.Disposed);
+        }
+
 
         [Fact]
         public void ThrowsIfDisposed()

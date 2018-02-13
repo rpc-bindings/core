@@ -15,5 +15,8 @@ namespace DSerfozo.RpcBindings.Contract.Communication.Model
 
         [ShouldSerialize]
         public PropertySetExecution<TMarshal> PropertySet { get; set; }
+
+        [ShouldSerialize]
+        public DynamicObjectRequest DynamicObjectRequest { get; set; }
     }
 }

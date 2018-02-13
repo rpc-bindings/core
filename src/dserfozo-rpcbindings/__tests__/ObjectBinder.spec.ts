@@ -1,5 +1,6 @@
 import 'jest';
-import { ObjectBinder, FunctionBinder, PropertyBinder } from '../src';
+import { FunctionBinder, MethodDescriptor, ObjectBinder, PropertyBinder } from '../src';
+import { ObjectDescriptor, MethodDescriptor } from '../src/ObjectDescriptor';
 
 describe('ObjectBinder', () => {
     it('Should create', () => {
@@ -57,5 +58,18 @@ describe('ObjectBinder', () => {
         binder.bind(obj);
 
         expect(typeof obj.namespace1.namespace2.objName).toBe('object');
+    });
+
+    it('Should create new object', () => {
+        const testMethods = {1: { id: 1, name: 'method'}};
+        const binder = new ObjectBinder({
+            id: 1,
+            methods: testMethods,
+            name: 'objName',
+        } as ObjectDescriptor,
+         {} as any, {} as any, {} as any, {} as any);
+        const obj = binder.bindToNew();
+
+        expect(typeof obj.method).toBe('function');
     });
 });

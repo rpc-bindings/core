@@ -1,3 +1,5 @@
+import { ObjectDescriptor } from './ObjectDescriptor';
+
 export interface CallbackExecution {
     executionId: number;
     functionId: number;
@@ -50,11 +52,24 @@ export interface CallbackResult {
     exception: string;
 }
 
+export interface DynamicObjectResponse {
+    executionId: number;
+    success: boolean;
+    objectDescriptor: ObjectDescriptor;
+    exception: string;
+}
+
+export interface DynamicObjectRequest {
+    executionId: number;
+    name: string;
+}
+
 export interface RpcRequest {
     callbackExecution: CallbackExecution;
     methodResult: MethodResult;
     deleteCallback: DeleteCallback;
     propertyResult: PropertyGetSetResult;
+    dynamicObjectResult: DynamicObjectResponse;
 }
 
 export interface RpcResponse {

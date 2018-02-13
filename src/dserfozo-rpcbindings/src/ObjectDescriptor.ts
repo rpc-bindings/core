@@ -13,6 +13,6 @@ export interface PropertyDescriptor {
 export interface ObjectDescriptor {
     id: number;
     name: string;
-    methods:Map<number, MethodDescriptor>;
-    properties: Map<number, PropertyDescriptor>;
+    methods: Map<number, MethodDescriptor> | any;
+    properties: Map<number, PropertyDescriptor> | any;
 }

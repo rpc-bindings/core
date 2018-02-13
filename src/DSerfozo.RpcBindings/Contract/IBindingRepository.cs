@@ -8,8 +8,12 @@ namespace DSerfozo.RpcBindings.Contract
     {
         IReadOnlyDictionary<int, ObjectDescriptor> Objects { get; }
 
-        void AddBinding<TObject>(string key, TObject obj);
+        ObjectDescriptor AddBinding<TObject>(string key, TObject obj);
 
-        void AddBinding(string key, object obj);
+        ObjectDescriptor AddBinding(string key, object obj);
+
+        ObjectDescriptor AddDisposableBinding(string key, IDisposable obj);
+
+        bool TryGetObjectByName(string name, out ObjectDescriptor objectDescriptor);
     }
 }
