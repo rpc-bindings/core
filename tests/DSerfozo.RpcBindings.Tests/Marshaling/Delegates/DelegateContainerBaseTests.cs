@@ -28,7 +28,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling.Delegates
         {
             var callbackExecutor = Mock.Of<ICallbackExecutor<object>>();
             var callbackExecutorMock = Mock.Get(callbackExecutor);
-
+            callbackExecutorMock.SetupGet(_ => _.CanExecute).Returns(true);
             Sun(callbackExecutor);
 
             GC.Collect();

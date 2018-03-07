@@ -1,14 +1,12 @@
-﻿using DSerfozo.RpcBindings.Model;
-using System;
-using System.Threading.Tasks;
+﻿using System;
 using DSerfozo.RpcBindings.Contract.Communication.Model;
 
 namespace DSerfozo.RpcBindings.Contract
 {
-    public interface IConnection<TMarshal>
+    public interface IConnection<TMarshal> : IObservable<RpcResponse<TMarshal>>
     {
-        event Action<RpcResponse<TMarshal>> RpcResponse;
+        bool IsOpen { get; }
 
-        Task Send(RpcRequest<TMarshal> rpcRequest);
+        void Send(RpcRequest<TMarshal> rpcRequest);
     }
 }

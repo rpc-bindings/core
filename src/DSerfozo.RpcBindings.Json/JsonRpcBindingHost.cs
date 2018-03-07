@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Concurrency;
 using DSerfozo.RpcBindings.Contract;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,7 +14,7 @@ namespace DSerfozo.RpcBindings.Json
         };
 
         public JsonRpcBindingHost(Func<JsonSerializer, IConnection<JToken>> connectionFactory)
-            :base(connectionFactory(JsonSerializer), factory => new JsonBinder(JsonSerializer, factory))
+            :base(connectionFactory(JsonSerializer), factory => new JsonBinder(JsonSerializer, factory), new EventLoopScheduler())
         {
             
         }

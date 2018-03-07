@@ -24,6 +24,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
             var callbackExecutor = Mock.Of<ICallbackExecutor<object>>();
             var callbackExecutorMock = Mock.Get(callbackExecutor);
             callbackExecutorMock.Setup(_ => _.Execute(It.Is<CallbackExecutionParameters<object>>(c => c.Id == 9 && (string)c.Parameters[0] == "input"))).Returns(Task.FromResult<object>("result"));
+            callbackExecutorMock.SetupGet(_ => _.CanExecute).Returns(true);
             var callbackFactory = new CallbackFactory<object>(callbackExecutor);
 
             Func<string, Task<string>> del = (Func<string, Task<string>>) callbackFactory.CreateCallback(9,

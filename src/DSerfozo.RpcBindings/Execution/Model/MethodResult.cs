@@ -1,9 +1,8 @@
-﻿using System;
-using DSerfozo.RpcBindings.Contract;
+﻿using DSerfozo.RpcBindings.Contract;
 
 namespace DSerfozo.RpcBindings.Execution.Model
 {
-    public sealed class MethodResult
+    public sealed class MethodResult<TMarshal>
     {
         [ShouldSerialize]
         public int ExecutionId { get; set; }
@@ -12,9 +11,9 @@ namespace DSerfozo.RpcBindings.Execution.Model
         public bool Success { get; set; }
 
         [ShouldSerialize]
-        public object Result { get; set; }
+        public TMarshal Result { get; set; }
 
         [ShouldSerialize]
-        public Exception Error { get; set; }
+        public string Error { get; set; }
     }
 }

@@ -12,7 +12,9 @@ namespace DSerfozo.RpcBindings.Marshaling
         private readonly IParameterBinder<TMarshal> parameterBinder;
         private bool disposed;
 
-        public bool CanExecute => !disposed;
+        public bool CanExecute => !disposed && executor.CanExecute;
+
+        public int Id => id;
 
         protected CallbackBase(int id, ICallbackExecutor<TMarshal> executor, IParameterBinder<TMarshal> parameterBinder)
         {
@@ -21,7 +23,7 @@ namespace DSerfozo.RpcBindings.Marshaling
             this.parameterBinder = parameterBinder;
         }
 
-        public async Task<object> Execute(object[] args)
+        public async Task<object> ExecuteAsync(params object[] args)
         {
             if (!CanExecute)
             {
@@ -41,7 +43,11 @@ namespace DSerfozo.RpcBindings.Marshaling
         {
             if (!disposed)
             {
-                executor.DeleteCallback(id);
+                if (executor.CanExecute)
+                {
+                    executor.DeleteCallback(id);
+                }
+
                 disposed = true;
             }
         }

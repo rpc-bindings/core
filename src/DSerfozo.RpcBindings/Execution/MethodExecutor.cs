@@ -20,7 +20,7 @@ namespace DSerfozo.RpcBindings.Execution
             this.parameterBinder = parameterBinder;
         }
 
-        public async Task<MethodResult> Execute(MethodExecution<TMarshal> methodExcecution)
+        public async Task<MethodResult<TMarshal>> Execute(MethodExecution<TMarshal> methodExcecution)
         {
             if(!objects.TryGetValue(methodExcecution.ObjectId, out var objectDescriptor))
             {
@@ -32,13 +32,13 @@ namespace DSerfozo.RpcBindings.Execution
                 throw new InvalidOperationException("");
             }
 
-            var result = new MethodResult
+            var result = new MethodResult<TMarshal>
             {
                 ExecutionId = methodExcecution.ExecutionId
             };
             if(methodDescriptor.ParameterCount > 0 && methodDescriptor.ParameterCount != methodExcecution.Parameters.Length)
             {
-                result.Error = new ParameterMismatchException();
+                result.Error = "Parameter mismatch.";
                 return result;
             }
 
@@ -62,7 +62,7 @@ namespace DSerfozo.RpcBindings.Execution
             {
                 if ((parameterTypes[i] != null || parameters[i].Type.IsValueType) && !parameters[i].Type.IsAssignableFrom(parameterTypes[i]))
                 {
-                    result.Error = new ParameterMismatchException();
+                    result.Error = "Parameter mismatch.";
                     return result;
                 }
             }
@@ -71,29 +71,32 @@ namespace DSerfozo.RpcBindings.Execution
             {
                 var executeResult = methodDescriptor.Execute(objectDescriptor.Object, boundParameters.ToArray());
 
+                object actualResult = null;
                 if (executeResult is Task)
                 {
                     await (executeResult as Task).ConfigureAwait(false);
 
                     if (executeResult.GetType().IsGenericType)
                     {
-                        result.Result = executeResult.GetType().GetProperty(nameof(Task<object>.Result)).GetValue(executeResult);
+                        actualResult = executeResult.GetType().GetProperty(nameof(Task<object>.Result)).GetValue(executeResult);
                     }
                 }
                 else
                 {
-                    result.Result = executeResult;
+                    actualResult = executeResult;
                 }
+
+                result.Result = parameterBinder.BindToWire(actualResult);
 
                 result.Success = true;
             }
             catch(TargetInvocationException e)
             {
-                result.Error = e.InnerException;
+                result.Error = e.InnerException?.Message;
             }
             catch(Exception e)
             {
-                result.Error = e;
+                result.Error = e.Message;
             }
 
             return result;

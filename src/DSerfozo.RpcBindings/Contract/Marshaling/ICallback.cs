@@ -7,6 +7,6 @@ namespace DSerfozo.RpcBindings.Contract
     {
         bool CanExecute { get; }
 
-        Task<object> Execute(params object[] args);
+        Task<object> ExecuteAsync(params object[] args);
     }
 }

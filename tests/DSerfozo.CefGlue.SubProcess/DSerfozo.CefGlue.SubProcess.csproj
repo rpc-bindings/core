@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net461</TargetFramework>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Javascript\test_extension.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Javascript\test_extension.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DSerfozo.RpcBindings.CefGlue\DSerfozo.RpcBindings.CefGlue.csproj" />
+    <ProjectReference Include="..\..\src\DSerfozo.RpcBindings\DSerfozo.RpcBindings.csproj" />
+  </ItemGroup>
+
+</Project>

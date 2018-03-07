@@ -8,7 +8,7 @@ namespace DSerfozo.RpcBindings.Tests.Fixtures
     {
         public void ThrowException()
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("Error");
         }
     }
 }

@@ -29,11 +29,15 @@ namespace DSerfozo.RpcBindings.Execution
         private readonly ISubject<CallbackExecution<TMarshal>> callbackExecutionSubject = new Subject<CallbackExecution<TMarshal>>();
         private readonly ISubject<DeleteCallback> deleteSubject = new Subject<DeleteCallback>();
         private readonly IIdGenerator idGenerator;
+        private readonly Func<bool> connectionAvailable;
 
-        public CallbackExecutor(IIdGenerator idGenerator, IObservable<CallbackResult<TMarshal>> resultStream)
+        public bool CanExecute => connectionAvailable();
+
+        public CallbackExecutor(IIdGenerator idGenerator, Func<bool> connectionAvailable, IObservable<CallbackResult<TMarshal>> resultStream)
         {
             resultStream.Subscribe(OnCallbackResult);
             this.idGenerator = idGenerator;
+            this.connectionAvailable = connectionAvailable;
         }
 
         public IDisposable Subscribe(IObserver<CallbackExecution<TMarshal>> observer)
@@ -48,6 +52,11 @@ namespace DSerfozo.RpcBindings.Execution
 
         public Task<object> Execute(CallbackExecutionParameters<TMarshal> execute)
         {
+            if (!CanExecute)
+            {
+                throw new InvalidOperationException("Cannot execute.");
+            }
+
             var pending = new PendingExecution
             {
                 TargetType = execute.ResultTargetType,
@@ -68,6 +77,11 @@ namespace DSerfozo.RpcBindings.Execution
 
         public void DeleteCallback(int id)
         {
+            if (!CanExecute)
+            {
+                throw new InvalidOperationException("Cannot delete.");
+            }
+
             deleteSubject.OnNext(new DeleteCallback
             {
                 FunctionId = id
