@@ -20,9 +20,7 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public void CallbackDeleted()
         {
-            var connection = Mock.Of<IConnection<object>>();
-            var connectionMock = Mock.Get(connection);
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), Mock.Of<IObservable<CallbackResult<object>>>());
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => true, Mock.Of<IObservable<CallbackResult<object>>>());
 
             DeleteCallback delete = null;
             ((IObservable<DeleteCallback>)executor).Subscribe(
@@ -36,12 +34,10 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public void ExecuteSent()
         {
-            var connection = Mock.Of<IConnection<object>>();
-            var connectionMock = Mock.Get(connection);
             var idGenerator = Mock.Of<IIdGenerator>();
             Mock.Get(idGenerator).Setup(_ => _.GetNextId()).Returns(1);
 
-            var executor = new CallbackExecutor<object>(idGenerator, Mock.Of<IObservable<CallbackResult<object>>>());
+            var executor = new CallbackExecutor<object>(idGenerator, () => true, Mock.Of<IObservable<CallbackResult<object>>>());
 
             CallbackExecution<object> exec = null;
             ((IObservable<CallbackExecution<object>>) executor).Subscribe(
@@ -64,14 +60,12 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public void ParametersBound()
         {
-            var connection = Mock.Of<IConnection<object>>();
-            var connectionMock = Mock.Get(connection);
             var parameterBinder = Mock.Of<IParameterBinder<object>>();
             var parameterBinderMock = Mock.Get(parameterBinder);
 
             parameterBinderMock.Setup(_ => _.BindToWire(It.IsAny<object>())).Returns("str");
 
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), Mock.Of<IObservable<CallbackResult<object>>>());
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => true, Mock.Of<IObservable<CallbackResult<object>>>());
 
             CallbackExecution<object> exec = null;
             ((IObservable<CallbackExecution<object>>)executor).Subscribe(
@@ -98,7 +92,7 @@ namespace DSerfozo.RpcBindings.Tests.Execution
             parameterBinderMock.Setup(_ => _.BindToNet(It.Is<ParameterBinding<object>>(s => s.TargetType == typeof(string)))).Returns("str");
 
             var responses = new Subject<CallbackResult<object>>();
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), responses);
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => true, responses);
 
             var task =  executor.Execute(new CallbackExecutionParameters<object>()
             {
@@ -120,29 +114,69 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         }
 
         [Fact]
-        public void ErrorHandled()
+        public async Task ErrorHandled()
         {
-            var connection = Mock.Of<IConnection<object>>();
-            var connectionMock = Mock.Get(connection);
-
             var responses = new Subject<CallbackResult<object>>();
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), responses);
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => true, responses);
 
-            var task = executor.Execute(new CallbackExecutionParameters<object>()
+            var task = executor.Execute(new CallbackExecutionParameters<object>
             {
                 Binder = new NoopObjectParameterBinder(),
                 Id = 2,
                 Parameters = new object[] { }
             });
 
+
             responses.OnNext(new CallbackResult<object>
             {
-                ExecutionId = 2,
+                ExecutionId = 0,
                 Success = false,
                 Error = "Error"
             });
 
-            Assert.ThrowsAsync<Exception>(() => task);
+            await Assert.ThrowsAsync<Exception>(() => task).ConfigureAwait(false);
+        }
+
+        [Fact]
+        public void CanExecuteReturned()
+        {
+            var responses = new Subject<CallbackResult<object>>();
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => false, responses);
+
+            Assert.False(executor.CanExecute);
+        }
+
+        [Fact]
+        public async Task ExecuteFails()
+        {
+            var idGenerator = Mock.Of<IIdGenerator>();
+            Mock.Get(idGenerator).Setup(_ => _.GetNextId()).Returns(1);
+
+            var executor = new CallbackExecutor<object>(idGenerator, () => false, Mock.Of<IObservable<CallbackResult<object>>>());
+
+            CallbackExecution<object> exec = null;
+            ((IObservable<CallbackExecution<object>>)executor).Subscribe(
+                callbackExecution => exec = callbackExecution);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => executor.Execute(new CallbackExecutionParameters<object>
+            {
+                Binder = new NoopObjectParameterBinder(),
+                Id = 2,
+                Parameters = new object[] { },
+                ResultTargetType = null
+            }));
+        }
+
+        [Fact]
+        public void DeletionFails()
+        {
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => false, Mock.Of<IObservable<CallbackResult<object>>>());
+
+            DeleteCallback delete = null;
+            ((IObservable<DeleteCallback>)executor).Subscribe(
+                deleteCallback => delete = deleteCallback);
+
+            Assert.Throws<InvalidOperationException>(() => executor.DeleteCallback(1));
         }
     }
 }

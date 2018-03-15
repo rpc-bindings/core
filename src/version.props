@@ -1,9 +1,12 @@
 <Project>
   <PropertyGroup>
-    <PackageVersion>0.0.2</PackageVersion>
+    <Version>0.0.3</Version>
+    <PackageVersion>$(Version)</PackageVersion>
     <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
     <VersionSuffix></VersionSuffix>
     <VersionSuffix Condition="'$(IsRtm)' != 'true' And '$(BuildNumber)' != ''">pre-$(BuildNumber)</VersionSuffix>
-    <PackageVersion Condition="'$(VersionSuffix)' != ''">0.0.2-$(VersionSuffix)</PackageVersion>
+    <PackageVersion Condition="'$(VersionSuffix)' != ''">$(Version)-$(VersionSuffix)</PackageVersion>
+    <AssemblyVersion>$(Version).0</AssemblyVersion>
+    <FileVersion>$(Version).0</FileVersion>
   </PropertyGroup>
 </Project>

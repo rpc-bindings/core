@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Reactive.Concurrency;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
@@ -13,16 +15,20 @@ namespace DSerfozo.RpcBindings.Json
     {
         private const int StreamBufferSize = 16 * 1024;
         private static readonly Encoding Utf8EncodingWithoutBom = new UTF8Encoding(false);
+
+        private readonly ISubject<RpcResponse<JToken>> rpcResponseSubject =
+            Subject.Synchronize(new Subject<RpcResponse<JToken>>(), new NewThreadScheduler());
         private readonly JsonSerializer jsonSerializer;
+        private bool failedWrite;
         private Stream inputStream;
         private Stream outputStream;
-
-        public event Action<RpcResponse<JToken>> RpcResponse;
 
         public static IConnection<JToken> Create(JsonSerializer jsonSerializer)
         {
             return new LineDelimitedJsonConnection(jsonSerializer);
         }
+
+        public bool IsOpen => outputStream != null && !failedWrite;
 
         public LineDelimitedJsonConnection(JsonSerializer jsonSerializer)
         {
@@ -37,17 +43,32 @@ namespace DSerfozo.RpcBindings.Json
             ReadLoop();
         }
 
-        public async Task Send(RpcRequest<JToken> rpcRequest)
+        public void Send(RpcRequest<JToken> rpcRequest)
         {
-            using (var writer = new StreamWriter(outputStream, Utf8EncodingWithoutBom, StreamBufferSize, true))
-            using (var stringWriter = new StringWriter())
-            using (var jsonWriter = new JsonTextWriter(stringWriter))
+            //the underlying connection can be severed at any moment, even in the disposes of the below created objects
+            //for example when this is called from the finalizer thread
+            try
             {
-                jsonWriter.CloseOutput = false;
+                using (var writer = new StreamWriter(outputStream, Utf8EncodingWithoutBom, StreamBufferSize, true))
+                using (var stringWriter = new StringWriter())
+                using (var jsonWriter = new JsonTextWriter(stringWriter))
+                {
+                    jsonWriter.CloseOutput = false;
 
-                jsonSerializer.Serialize(jsonWriter, rpcRequest);
-                await writer.WriteLineAsync(stringWriter.ToString()).ConfigureAwait(false);
+                    jsonSerializer.Serialize(jsonWriter, rpcRequest);
+
+                    writer.WriteLine(stringWriter.ToString());
+                }
             }
+            catch
+            {
+                failedWrite = true;
+            }
+        }
+
+        public IDisposable Subscribe(IObserver<RpcResponse<JToken>> observer)
+        {
+            return rpcResponseSubject.Subscribe(observer);
         }
 
         private async void ReadLoop()
@@ -62,7 +83,7 @@ namespace DSerfozo.RpcBindings.Json
                     break;
                 }
                 var response = jsonSerializer.Deserialize<RpcResponse<JToken>>(new JsonTextReader(new StringReader(line)));
-                RpcResponse?.Invoke(response);
+                rpcResponseSubject.OnNext(response);
             }
         }
     }

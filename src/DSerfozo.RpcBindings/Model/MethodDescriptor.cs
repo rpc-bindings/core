@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
 
 namespace DSerfozo.RpcBindings.Model
@@ -71,6 +72,8 @@ namespace DSerfozo.RpcBindings.Model
         public IEnumerable<MethodParameterDescriptor> Parameters { get; private set; }
 
         public Func<object, object[], object> Execute { get; private set; }
+
+        public bool IsAsync => typeof(Task).IsAssignableFrom(ResultType);
 
         public MethodDescriptor Clone()
         {

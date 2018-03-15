@@ -42,6 +42,11 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
                 return input+1;
             }
 
+            public int TestMethod2(int? val)
+            {
+                return val.HasValue ? val.Value + 1 : -1;
+            }
+
             public async Task<string> DelegateTest(Func<string, Task<string>> func)
             {
                 return await func("test").ConfigureAwait(false);
@@ -80,19 +85,27 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
         }
 
         [Fact]
+        public async Task NullableInputTypeWorks()
+        {
+            await initTask;
+
+            var result = await nodeServices.InvokeExportAsync<int>("binding-test", "testMethod2", 2);
+
+            Assert.Equal(3, result);
+        }
+
+        [Fact]
         public async Task DynamicObjectMethodCallWorks()
         {
             await initTask;
 
-            rpcHost.ResolvingBoundObject += args =>
+            rpcHost.ResolvingBoundObject += (s, args) =>
             {
                 if (args.Name == "testObj")
                 {
                     args.Disposable = false;
                     args.Object = new TestBound();
                 }
-
-                return Task.CompletedTask;
             };
 
             var result = await nodeServices.InvokeExportAsync<int>("binding-test", "dynamic", 3);

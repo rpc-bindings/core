@@ -5,6 +5,6 @@ namespace DSerfozo.RpcBindings.Contract
 {
     public interface IMethodExecutor<TMarshal>
     {
-        Task<MethodResult> Execute(MethodExecution<TMarshal> methodExcecution);
+        Task<MethodResult<TMarshal>> Execute(MethodExecution<TMarshal> methodExcecution);
     }
 }

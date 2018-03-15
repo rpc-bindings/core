@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Contract.Communication.Model;
 using DSerfozo.RpcBindings.Marshaling;
+using Microsoft.Reactive.Testing;
 using Moq;
 using Xunit;
 
@@ -13,8 +19,29 @@ namespace DSerfozo.RpcBindings.Tests
     {
         private class TestHost : RpcBindingHost<object>
         {
-            public TestHost(IConnection<object> connection, Func<ICallbackFactory<object>, IParameterBinder<object>> parameterBinderFactory) : base(connection, parameterBinderFactory)
+            public TestHost(IConnection<object> connection,
+                Func<ICallbackFactory<object>, IParameterBinder<object>> parameterBinderFactory,
+                IScheduler baseScheduler) : base(connection, parameterBinderFactory,
+                baseScheduler)
             {
+            }
+        }
+
+        public class ConnectionStub : IConnection<object>
+        {
+            public readonly ISubject<RpcResponse<object>> IncomingSubject = new Subject<RpcResponse<object>>();
+            public readonly ISubject<RpcRequest<object>, RpcRequest<object>> OutgoingSubject = new Subject<RpcRequest<object>>();
+
+            public bool IsOpen => true;
+
+            public IDisposable Subscribe(IObserver<RpcResponse<object>> observer)
+            {
+                return IncomingSubject.Subscribe(observer);
+            }
+
+            public virtual void Send(RpcRequest<object> rpcRequest)
+            {
+                OutgoingSubject.OnNext(rpcRequest);
             }
         }
 
@@ -24,7 +51,7 @@ namespace DSerfozo.RpcBindings.Tests
             var connection = Mock.Of<IConnection<object>>();
 
             IBindingRepository bindingRepository;
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder()))
+            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), new TestScheduler()))
             {
                 bindingRepository = host.Repository;
             }
@@ -33,27 +60,43 @@ namespace DSerfozo.RpcBindings.Tests
         }
 
         [Fact]
-        public void NonExistingDynamicObjectRegistered()
+        public void SchedulerDisposed()
         {
             var connection = Mock.Of<IConnection<object>>();
-            var connectionMock = Mock.Get(connection);
 
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder()))
+            IBindingRepository bindingRepository;
+            var baseSchedulerMock = new Mock<IScheduler>();
+            var disp = baseSchedulerMock.As<IDisposable>();
+            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseSchedulerMock.Object))
             {
-                host.ResolvingBoundObject += (args) =>
+                bindingRepository = host.Repository;
+            }
+
+            disp.Verify(_ => _.Dispose());
+        }
+
+        [Fact]
+        public void NonExistingDynamicObjectRegistered()
+        {
+            var baseScheduler= new TestScheduler();
+            var connection = new ConnectionStub();
+            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
+            {
+                host.ResolvingBoundObject += (s, args) =>
                 {
                     args.Object = new object();
-                    return Task.CompletedTask; 
                 };
 
-                connectionMock.Raise(_ => _.RpcResponse += null, new RpcResponse<object>
+                baseScheduler.Start();
+                connection.IncomingSubject.OnNext(new RpcResponse<object>
                 {
-                    DynamicObjectRequest = new DynamicObjectRequest()
+                    DynamicObjectRequest = new DynamicObjectRequest
                     {
                         ExecutionId = 1,
                         Name = "testObj"
                     }
                 });
+                baseScheduler.AdvanceBy(1);
 
                 Assert.Equal("testObj", host.Repository.Objects.Values.First().Name);
             }
@@ -62,25 +105,27 @@ namespace DSerfozo.RpcBindings.Tests
         [Fact]
         public void NonExistingDynamicObjectReturned()
         {
-            var connection = Mock.Of<IConnection<object>>();
+            var connection = Mock.Of<ConnectionStub>();
             var connectionMock = Mock.Get(connection);
 
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder()))
+            var baseScheduler = new TestScheduler();
+            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
             {
-                host.ResolvingBoundObject += (args) =>
+                host.ResolvingBoundObject += (s, args) =>
                 {
                     args.Object = new object();
-                    return Task.CompletedTask;
                 };
 
-                connectionMock.Raise(_ => _.RpcResponse += null, new RpcResponse<object>
+                baseScheduler.Start();
+                connection.IncomingSubject.OnNext(new RpcResponse<object>
                 {
-                    DynamicObjectRequest = new DynamicObjectRequest()
+                    DynamicObjectRequest = new DynamicObjectRequest
                     {
                         ExecutionId = 1,
                         Name = "testObj"
                     }
                 });
+                baseScheduler.AdvanceBy(1);
 
                 connectionMock.Verify(_ => _.Send(It.Is<RpcRequest<object>>(r =>
                     r.DynamicObjectResult.ExecutionId == 1 &&
@@ -89,27 +134,25 @@ namespace DSerfozo.RpcBindings.Tests
             }
         }
 
-
         [Fact]
         public void NonExistingDynamicObjectAddedAsDisposable()
         {
-            var connection = Mock.Of<IConnection<object>>();
-            var connectionMock = Mock.Get(connection);
-
             var disposable = Mock.Of<IDisposable>();
             var disposableMock = Mock.Get(disposable);
 
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder()))
+            var baseScheduler = new TestScheduler();
+            var connection = new ConnectionStub();
+            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
             {
-                host.ResolvingBoundObject += (args) =>
+                host.ResolvingBoundObject += (s, args) =>
                 {
-                    
+
                     args.Object = disposable;
                     args.Disposable = true;
-                    return Task.CompletedTask;
                 };
 
-                connectionMock.Raise(_ => _.RpcResponse += null, new RpcResponse<object>
+                baseScheduler.Start();
+                connection.IncomingSubject.OnNext(new RpcResponse<object>
                 {
                     DynamicObjectRequest = new DynamicObjectRequest()
                     {
@@ -117,6 +160,7 @@ namespace DSerfozo.RpcBindings.Tests
                         Name = "testObj"
                     }
                 });
+                baseScheduler.AdvanceBy(1);
             }
 
             disposableMock.Verify(_ => _.Dispose());
@@ -125,23 +169,22 @@ namespace DSerfozo.RpcBindings.Tests
         [Fact]
         public void NonExistingDynamicObjectAddedAsNonDisposable()
         {
-            var connection = Mock.Of<IConnection<object>>();
-            var connectionMock = Mock.Get(connection);
-
             var disposable = Mock.Of<IDisposable>();
             var disposableMock = Mock.Get(disposable);
 
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder()))
+            var baseScheduler = new TestScheduler();
+            var connection = new ConnectionStub();
+            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
             {
-                host.ResolvingBoundObject += (args) =>
+                host.ResolvingBoundObject += (s, args) =>
                 {
 
                     args.Object = disposable;
                     args.Disposable = false;
-                    return Task.CompletedTask;
                 };
 
-                connectionMock.Raise(_ => _.RpcResponse += null, new RpcResponse<object>
+                baseScheduler.Start();
+                connection.IncomingSubject.OnNext(new RpcResponse<object>
                 {
                     DynamicObjectRequest = new DynamicObjectRequest()
                     {
@@ -149,6 +192,7 @@ namespace DSerfozo.RpcBindings.Tests
                         Name = "testObj"
                     }
                 });
+                baseScheduler.AdvanceBy(1);
             }
 
             disposableMock.Verify(_ => _.Dispose(), Times.Never);
@@ -157,14 +201,16 @@ namespace DSerfozo.RpcBindings.Tests
         [Fact]
         public void NonExistingDynamicObjectErrorReturned()
         {
-            var connection = Mock.Of<IConnection<object>>();
+            var connection = Mock.Of<ConnectionStub>();
             var connectionMock = Mock.Get(connection);
 
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder()))
+            var baseScheduler = new TestScheduler();
+            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
             {
-                host.ResolvingBoundObject += (name) => Task.FromException<object>(new Exception("Error"));
+                host.ResolvingBoundObject += (s, args) => throw new Exception("Error");
 
-                connectionMock.Raise(_ => _.RpcResponse += null, new RpcResponse<object>
+                baseScheduler.Start();
+                connection.IncomingSubject.OnNext(new RpcResponse<object>
                 {
                     DynamicObjectRequest = new DynamicObjectRequest
                     {
@@ -172,6 +218,7 @@ namespace DSerfozo.RpcBindings.Tests
                         Name = "testObj"
                     }
                 });
+                baseScheduler.AdvanceBy(1);
 
                 connectionMock.Verify(_ => _.Send(It.Is<RpcRequest<object>>(r =>
                     r.DynamicObjectResult.ExecutionId == 1 &&
@@ -183,15 +230,14 @@ namespace DSerfozo.RpcBindings.Tests
         [Fact]
         public void NonExistingDynamicObjectResolveErrorReturned()
         {
-            var connection = Mock.Of<IConnection<object>>();
+            var connection = Mock.Of<ConnectionStub>();
             var connectionMock = Mock.Get(connection);
 
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder()))
+            var baseScheduler = new TestScheduler();
+            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
             {
-                ResolvingBoundObjectArgs raisedArgs = null;
-                host.ResolvingBoundObject += (name) => Task.CompletedTask;
-
-                connectionMock.Raise(_ => _.RpcResponse += null, new RpcResponse<object>
+                baseScheduler.Start();
+                connection.IncomingSubject.OnNext(new RpcResponse<object>
                 {
                     DynamicObjectRequest = new DynamicObjectRequest
                     {
@@ -199,6 +245,7 @@ namespace DSerfozo.RpcBindings.Tests
                         Name = "testObj"
                     }
                 });
+                baseScheduler.AdvanceBy(1);
 
                 connectionMock.Verify(_ => _.Send(It.Is<RpcRequest<object>>(r =>
                     r.DynamicObjectResult.ExecutionId == 1 &&
@@ -209,14 +256,16 @@ namespace DSerfozo.RpcBindings.Tests
         [Fact]
         public void ExistingDynamicObjectReturned()
         {
-            var connection = Mock.Of<IConnection<object>>();
+            var connection = Mock.Of<ConnectionStub>();
             var connectionMock = Mock.Get(connection);
 
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder()))
+            var baseScheduler = new TestScheduler();
+            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
             {
                 var desc = host.Repository.AddBinding("testObj", new object());
 
-                connectionMock.Raise(_ => _.RpcResponse += null, new RpcResponse<object>
+                baseScheduler.Start();
+                connection.IncomingSubject.OnNext(new RpcResponse<object>
                 {
                     DynamicObjectRequest = new DynamicObjectRequest
                     {
@@ -224,6 +273,7 @@ namespace DSerfozo.RpcBindings.Tests
                         Name = "testObj"
                     }
                 });
+                baseScheduler.AdvanceBy(1);
 
                 connectionMock.Verify(_ => _.Send(It.Is<RpcRequest<object>>(r =>
                     r.DynamicObjectResult.ExecutionId == 1 &&

@@ -26,11 +26,11 @@ namespace DSerfozo.RpcBindings.Json.Tests
 
                 var ev = new ManualResetEvent(false);
                 RpcResponse<JToken> resp = null;
-                connection.RpcResponse += response =>
+                connection.Subscribe(response =>
                 {
                     resp = response;
                     ev.Set();
-                };
+                });
                 connection.Initialize(memStream, null);
 
                 ev.WaitOne();
@@ -39,7 +39,7 @@ namespace DSerfozo.RpcBindings.Json.Tests
         }
 
         [Fact]
-        public async Task MessageWritten()
+        public void MessageWritten()
         {
             var connection = new LineDelimitedJsonConnection(new JsonSerializer());
             using (var memStreamInput = new MemoryStream())
@@ -48,7 +48,7 @@ namespace DSerfozo.RpcBindings.Json.Tests
             {
                 connection.Initialize(memStreamInput, memStreamOutput);
 
-                await connection.Send(new RpcRequest<JToken>
+                connection.Send(new RpcRequest<JToken>
                 {
                     DeleteCallback = new DeleteCallback
                     {
@@ -59,7 +59,7 @@ namespace DSerfozo.RpcBindings.Json.Tests
                 memStreamOutput.Seek(0, SeekOrigin.Begin);
 
                 var line = streamReader.ReadLine();
-                Assert.Equal(@"{""MethodResult"":null,""CallbackExecution"":null,""DeleteCallback"":{""FunctionId"":1}}", line);
+                Assert.Equal(@"{""MethodResult"":null,""CallbackExecution"":null,""DeleteCallback"":{""FunctionId"":1},""PropertyResult"":null,""DynamicObjectResult"":null}", line);
             }
         }
     }

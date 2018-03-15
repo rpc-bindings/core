@@ -66,7 +66,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                 Parameters = new object[] { }
             });
 
-            Assert.IsType<ParameterMismatchException>(result.Error);
+            Assert.Equal("Parameter mismatch.", result.Error);
             Assert.False(result.Success);
         }
 
@@ -93,7 +93,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                 Parameters = new object[] { 1 }
             });
 
-            Assert.IsType<ParameterMismatchException>(result.Error);
+            Assert.Equal("Parameter mismatch.", result.Error);
             Assert.False(result.Success);
         }
 
@@ -140,11 +140,11 @@ namespace DSerfozo.RpcBindings.Tests.Calling
 
             var methodExecutor = new MethodExecutor<object>(
                     new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>()
+                        new Dictionary<int, ObjectDescriptor>
                         {
                             { 1, ObjectDescriptor.Create()
                             .WithObject(new SimpleClassWithExceptions())
-                            .WithMethods(new List<MethodDescriptor>()
+                            .WithMethods(new List<MethodDescriptor>
                             {
                                 MethodDescriptor.Create()
                                 .WithId(2)
@@ -158,15 +158,14 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                             }).WithId(1).Get() }
                         }), new NoopObjectParameterBinder());
 
-            const string Value = "expected";
-            var result = await methodExecutor.Execute(new MethodExecution<object>()
+            var result = await methodExecutor.Execute(new MethodExecution<object>
             {
                 ObjectId = 1,
                 MethodId = 2,
                 Parameters = new object[] { }
             });
 
-            Assert.IsType<NotSupportedException>(result.Error);
+            Assert.Equal("Error", result.Error);
             Assert.False(result.Success);
         }
 
@@ -219,7 +218,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                                 {
                                     new MethodParameterDescriptor(typeof(string), false)
                                 })
-                                .WithExecute((o, a) => Task.FromException(new NotSupportedException()))
+                                .WithExecute((o, a) => Task.FromException(new NotSupportedException("Error")))
                                 .Get()
                             }).WithId(1).Get() }
                         }), new NoopObjectParameterBinder());
@@ -232,7 +231,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                 Parameters = new object[] { Value }
             });
 
-            Assert.IsType<NotSupportedException>(result.Error);
+            Assert.Equal("Error", result.Error);
             Assert.False(result.Success);
         }
     }

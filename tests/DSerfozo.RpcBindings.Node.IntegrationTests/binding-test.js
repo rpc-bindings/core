@@ -3,6 +3,11 @@
     callback(null, result);
 }
 
+exports.testMethod2 = async function (callback, input) {
+    const result = await test.testMethod2(input);
+    callback(null, result);
+}
+
 exports.dynamic = async function (callback, input) {
     try {
         const obj = await requireObject('testObj');

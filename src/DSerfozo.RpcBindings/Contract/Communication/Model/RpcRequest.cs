@@ -5,7 +5,7 @@ namespace DSerfozo.RpcBindings.Contract.Communication.Model
     public class RpcRequest<TMarshal>
     {
         [ShouldSerialize]
-        public MethodResult MethodResult { get; set; }
+        public MethodResult<TMarshal> MethodResult { get; set; }
 
         [ShouldSerialize]
         public CallbackExecution<TMarshal> CallbackExecution { get; set; }

@@ -12,7 +12,7 @@ namespace DSerfozo.RpcBindings.Marshaling.Delegates
 
         protected async Task<T> ExecuteAsync<T>(params object[] obj)
         {
-            return (T)await Execute(obj).ConfigureAwait(false);
+            return (T)await ExecuteAsync(obj).ConfigureAwait(false);
         }
 
         ~DelegateContainerBase()
