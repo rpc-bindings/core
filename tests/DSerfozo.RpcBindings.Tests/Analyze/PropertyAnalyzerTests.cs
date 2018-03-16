@@ -77,5 +77,23 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
             Assert.Equal(IntValue, obj.IntProperty);
             Assert.Equal(DoubleValue, obj.DoubleProperty);
         }
+
+        [Fact]
+        public void IgnoredPropertySkipped()
+        {
+            PropertyAnalyzer propertyAnalyzer = new PropertyAnalyzer(new IntIdGenerator(), Mock.Of<IPropertyNameGenerator>());
+            var actual = propertyAnalyzer.AnalyzeProperties(typeof(SimpleClassIgnore)).ToList();
+
+            Assert.Equal(1, actual.Count);
+        }
+
+        [Fact]
+        public void IndexerSkipped()
+        {
+            PropertyAnalyzer propertyAnalyzer = new PropertyAnalyzer(new IntIdGenerator(), Mock.Of<IPropertyNameGenerator>());
+            var actual = propertyAnalyzer.AnalyzeProperties(typeof(SimpleClassWithIndexer)).ToList();
+
+            Assert.Equal(0, actual.Count);
+        }
     }
 }

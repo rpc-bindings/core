@@ -20,7 +20,11 @@ namespace DSerfozo.RpcBindings.Analyze
 
         public IEnumerable<MethodDescriptor> AnalyzeMethods(Type type)
         {
-            foreach (var methodInfo in type.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(m => !m.IsSpecialName && m.DeclaringType != typeof(object)))
+            var methodInfos = type.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .Where(m => !m.IsSpecialName &&
+                            m.DeclaringType != typeof(object) &&
+                            !m.IsDefined(typeof(BindingIgnoreAttribute)));
+            foreach (var methodInfo in methodInfos)
             {
                 var parameterInfo = methodInfo.GetParameters();
                 yield return MethodDescriptor.Create()

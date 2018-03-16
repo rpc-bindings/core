@@ -70,6 +70,15 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
         }
 
         [Fact]
+        public void IgnoredMethodsSkipped()
+        {
+            MethodAnalyzer methodAnalyzer = new MethodAnalyzer(new IntIdGenerator(), new IdentityNameGenerator());
+            var actual = methodAnalyzer.AnalyzeMethods(typeof(SimpleClassIgnore)).ToList();
+
+            Assert.Equal(1, actual.Count);
+        }
+
+        [Fact]
         public void ExecuteSetForMethods()
         {
             const int intValue = 1;

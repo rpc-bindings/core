@@ -20,7 +20,11 @@ namespace DSerfozo.RpcBindings.Analyze
 
         public IEnumerable<PropertyDescriptor> AnalyzeProperties(Type type)
         {
-            foreach(var propertyInfo in type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => !p.IsSpecialName))
+            var propertyInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(p => !p.IsSpecialName && 
+                            !p.IsDefined(typeof(BindingIgnoreAttribute)) &&
+                            p.GetIndexParameters().Length <= 0);
+            foreach(var propertyInfo in propertyInfos)
             {
                 yield return PropertyDescriptor.Create()
                     .WithId(idGenerator.GetNextId())
