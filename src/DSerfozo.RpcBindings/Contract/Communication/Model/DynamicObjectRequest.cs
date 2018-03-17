@@ -3,7 +3,7 @@
     public class DynamicObjectRequest
     {
         [ShouldSerialize]
-        public int ExecutionId { get; set; }
+        public long ExecutionId { get; set; }
 
         [ShouldSerialize]
         public string Name { get; set; }

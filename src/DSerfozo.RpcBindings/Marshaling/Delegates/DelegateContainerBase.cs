@@ -5,7 +5,7 @@ namespace DSerfozo.RpcBindings.Marshaling.Delegates
 {
     public class DelegateContainerBase<TMarshal> : CallbackBase<TMarshal>
     {
-        public DelegateContainerBase(int id, ICallbackExecutor<TMarshal> executor, IParameterBinder<TMarshal> parameterBinder) 
+        public DelegateContainerBase(long id, ICallbackExecutor<TMarshal> executor, IParameterBinder<TMarshal> parameterBinder) 
             : base(id, executor, parameterBinder)
         {
         }

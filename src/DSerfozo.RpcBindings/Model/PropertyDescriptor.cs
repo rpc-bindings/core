@@ -13,7 +13,7 @@ namespace DSerfozo.RpcBindings.Model
                 Writable = true
             };
 
-            public Builder WithId(int id)
+            public Builder WithId(long id)
             {
                 constructed.Id = id;
                 return this;
@@ -56,7 +56,7 @@ namespace DSerfozo.RpcBindings.Model
         }
 
         [ShouldSerialize]
-        public int Id { get; private set;  }
+        public long Id { get; private set;  }
 
         [ShouldSerialize]
         public string Name { get; private set; }

@@ -5,9 +5,9 @@ namespace DSerfozo.RpcBindings.Analyze
 {
     public sealed class IntIdGenerator : IIdGenerator
     {
-        private int lastId;
+        private long lastId;
 
-        public int GetNextId()
+        public long GetNextId()
         {
             return Interlocked.Increment(ref lastId);
         }

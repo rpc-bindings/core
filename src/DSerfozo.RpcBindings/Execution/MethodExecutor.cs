@@ -11,10 +11,10 @@ namespace DSerfozo.RpcBindings.Execution
 {
     public class MethodExecutor<TMarshal> : IMethodExecutor<TMarshal>
     {
-        private readonly IReadOnlyDictionary<int, ObjectDescriptor> objects;
+        private readonly IReadOnlyDictionary<long, ObjectDescriptor> objects;
         private readonly IParameterBinder<TMarshal> parameterBinder;
 
-        public MethodExecutor(IReadOnlyDictionary<int, ObjectDescriptor> objects, IParameterBinder<TMarshal> parameterBinder)
+        public MethodExecutor(IReadOnlyDictionary<long, ObjectDescriptor> objects, IParameterBinder<TMarshal> parameterBinder)
         {
             this.objects = objects;
             this.parameterBinder = parameterBinder;

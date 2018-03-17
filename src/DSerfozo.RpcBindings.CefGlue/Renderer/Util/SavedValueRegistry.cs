@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading;
 
@@ -8,15 +7,15 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Util
 {
     public class SavedValueRegistry<TValue> : IDisposable where TValue : IDisposable
     {
-        private readonly IDictionary<int, Tuple<long, TValue>> savedValues = new Dictionary<int, Tuple<long, TValue>>();
-        private int lastId;
+        private readonly IDictionary<long, Tuple<long, TValue>> savedValues = new Dictionary<long, Tuple<long, TValue>>();
+        private long lastId;
 
-        public bool Has(int id)
+        public bool Has(long id)
         {
             return savedValues.ContainsKey(id);
         }
 
-        public TValue Get(int id)
+        public TValue Get(long id)
         {
             var result = default(TValue);
             if (savedValues.TryGetValue(id, out var valueTuple))
@@ -28,7 +27,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Util
             return result;
         }
 
-        public int Save(long frameId, TValue value)
+        public long Save(long frameId, TValue value)
         {
             var nextId = Interlocked.Increment(ref lastId);
 
@@ -70,7 +69,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Util
             this.factory = factory;
         }
 
-        public int Save(long frameId, out TValue value)
+        public long Save(long frameId, out TValue value)
         {
             value = factory();
             return Save(frameId, value);

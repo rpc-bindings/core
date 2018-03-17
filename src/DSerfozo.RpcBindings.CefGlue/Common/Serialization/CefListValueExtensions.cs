@@ -39,10 +39,10 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
 
             using (var binaryValue = @this.GetBinary(index))
             {
-                var buffer = new byte[binaryValue.Size - 1];
-                binaryValue.GetData(buffer, binaryValue.Size, 1);
+                var buffer = new byte[binaryValue.Size];
+                binaryValue.GetData(buffer, binaryValue.Size, 0);
 
-                return BitConverter.ToInt64(buffer, 0);
+                return BitConverter.ToInt64(buffer, 1);
             }
         }
     }

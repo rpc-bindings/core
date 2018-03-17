@@ -7,16 +7,16 @@ namespace DSerfozo.RpcBindings.Marshaling
 {
     public abstract class CallbackBase<TMarshal> : IDisposable
     {
-        private readonly int id;
+        private readonly long id;
         private readonly ICallbackExecutor<TMarshal> executor;
         private readonly IParameterBinder<TMarshal> parameterBinder;
         private bool disposed;
 
         public bool CanExecute => !disposed && executor.CanExecute;
 
-        public int Id => id;
+        public long Id => id;
 
-        protected CallbackBase(int id, ICallbackExecutor<TMarshal> executor, IParameterBinder<TMarshal> parameterBinder)
+        protected CallbackBase(long id, ICallbackExecutor<TMarshal> executor, IParameterBinder<TMarshal> parameterBinder)
         {
             this.id = id;
             this.executor = executor;

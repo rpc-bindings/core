@@ -5,7 +5,7 @@ namespace DSerfozo.RpcBindings.Execution.Model
     public sealed class MethodResult<TMarshal>
     {
         [ShouldSerialize]
-        public int ExecutionId { get; set; }
+        public long ExecutionId { get; set; }
 
         [ShouldSerialize]
         public bool Success { get; set; }

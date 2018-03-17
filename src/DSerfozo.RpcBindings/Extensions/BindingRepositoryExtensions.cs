@@ -11,7 +11,7 @@ namespace DSerfozo.RpcBindings.Extensions
         {
             private readonly IBindingRepository wrapped;
 
-            public IReadOnlyDictionary<int, ObjectDescriptor> Objects => wrapped.Objects;
+            public IReadOnlyDictionary<long, ObjectDescriptor> Objects => wrapped.Objects;
 
             public ReadOnlyBindingRepositry(IBindingRepository wrapped)
             {

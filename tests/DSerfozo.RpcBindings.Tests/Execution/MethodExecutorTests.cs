@@ -19,7 +19,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
         {
             return Assert.ThrowsAsync<InvalidOperationException>(async () => 
             {
-                var methodExecutor = new MethodExecutor<object>(new ReadOnlyDictionary<int, ObjectDescriptor>(new Dictionary<int, ObjectDescriptor>()), new NoopObjectParameterBinder());
+                var methodExecutor = new MethodExecutor<object>(new ReadOnlyDictionary<long, ObjectDescriptor>(new Dictionary<long, ObjectDescriptor>()), new NoopObjectParameterBinder());
                 await methodExecutor.Execute(new MethodExecution<object>()
                 {
                     ObjectId = 1
@@ -33,8 +33,8 @@ namespace DSerfozo.RpcBindings.Tests.Calling
             return Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
                 var methodExecutor = new MethodExecutor<object>(
-                    new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>()
+                    new ReadOnlyDictionary<long, ObjectDescriptor>(
+                        new Dictionary<long, ObjectDescriptor>()
                         {
                             { 1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()).WithId(1).Get() }
                         }), new NoopObjectParameterBinder());
@@ -50,8 +50,8 @@ namespace DSerfozo.RpcBindings.Tests.Calling
         public async Task MethodParameterCountMismatchThrows()
         {
             var methodExecutor = new MethodExecutor<object>(
-                    new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>()
+                    new ReadOnlyDictionary<long, ObjectDescriptor>(
+                        new Dictionary<long, ObjectDescriptor>()
                         {
                             { 1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()
                             {
@@ -74,8 +74,8 @@ namespace DSerfozo.RpcBindings.Tests.Calling
         public async Task MethodParameterTypeMismatchThrows()
         {
             var methodExecutor = new MethodExecutor<object>(
-                    new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>()
+                    new ReadOnlyDictionary<long, ObjectDescriptor>(
+                        new Dictionary<long, ObjectDescriptor>()
                         {
                             { 1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()
                             {
@@ -101,8 +101,8 @@ namespace DSerfozo.RpcBindings.Tests.Calling
         public async Task MethodCalled()
         {
             var methodExecutor = new MethodExecutor<object>(
-                    new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>()
+                    new ReadOnlyDictionary<long, ObjectDescriptor>(
+                        new Dictionary<long, ObjectDescriptor>()
                         {
                             { 1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()
                             {
@@ -139,8 +139,8 @@ namespace DSerfozo.RpcBindings.Tests.Calling
             var method = typeof(SimpleClassWithExceptions).GetMethod("ThrowException");
 
             var methodExecutor = new MethodExecutor<object>(
-                    new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>
+                    new ReadOnlyDictionary<long, ObjectDescriptor>(
+                        new Dictionary<long, ObjectDescriptor>
                         {
                             { 1, ObjectDescriptor.Create()
                             .WithObject(new SimpleClassWithExceptions())
@@ -173,8 +173,8 @@ namespace DSerfozo.RpcBindings.Tests.Calling
         public async Task AsyncMethodCalledAndAwaited()
         {
             var methodExecutor = new MethodExecutor<object>(
-                    new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>()
+                    new ReadOnlyDictionary<long, ObjectDescriptor>(
+                        new Dictionary<long, ObjectDescriptor>()
                         {
                             { 1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()
                             {
@@ -206,8 +206,8 @@ namespace DSerfozo.RpcBindings.Tests.Calling
         public async Task AsyncMethodExceptionPassedAlong()
         {
             var methodExecutor = new MethodExecutor<object>(
-                    new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>()
+                    new ReadOnlyDictionary<long, ObjectDescriptor>(
+                        new Dictionary<long, ObjectDescriptor>()
                         {
                             { 1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()
                             {

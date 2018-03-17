@@ -6,7 +6,7 @@ namespace DSerfozo.RpcBindings.Contract
 {
     public interface IBindingRepository : IDisposable
     {
-        IReadOnlyDictionary<int, ObjectDescriptor> Objects { get; }
+        IReadOnlyDictionary<long, ObjectDescriptor> Objects { get; }
 
         ObjectDescriptor AddBinding<TObject>(string key, TObject obj);
 

@@ -9,7 +9,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
     {
         public static void ToCefList(this ObjectDescriptor descriptor, CefListValue cefList)
         {
-            cefList.SetInt(0, descriptor.Id);
+            cefList.SetInt64(0, descriptor.Id);
             cefList.SetString(1, descriptor.Name);
             var methodsList = CefListValue.Create();
             var values = descriptor.Methods.Values.ToList();
@@ -25,13 +25,13 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
 
         public static void ToCefList(this MethodDescriptor descriptor, CefListValue cefList)
         {
-            cefList.SetInt(0, descriptor.Id);
+            cefList.SetInt64(0, descriptor.Id);
             cefList.SetString(1, descriptor.Name);
         }
 
         public static ObjectDescriptor ReadObjectDescriptor(CefListValue cefList)
         {
-            var id = cefList.GetInt(0);
+            var id = cefList.GetInt64(0);
             var name = cefList.GetString(1);
             var methods = cefList.GetList(2);
 
@@ -47,7 +47,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
 
         public static MethodDescriptor ReadMethodDescriptor(CefListValue cefList)
         {
-            var id = cefList.GetInt(0);
+            var id = cefList.GetInt64(0);
             var name = cefList.GetString(1);
 
             return MethodDescriptor.Create().WithId(id).WithName(name).Get();

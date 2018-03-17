@@ -10,7 +10,7 @@ namespace DSerfozo.RpcBindings.Model
         {
             private readonly ObjectDescriptor constructed = new ObjectDescriptor();
 
-            public Builder WithId(int id)
+            public Builder WithId(long id)
             {
                 constructed.Id = id;
                 return this;
@@ -55,16 +55,16 @@ namespace DSerfozo.RpcBindings.Model
         }
 
         [ShouldSerialize]
-        public int Id { get; private set; }
+        public long Id { get; private set; }
 
         [ShouldSerialize]
         public string Name { get; private set; }
 
         [ShouldSerialize]
-        public IDictionary<int, PropertyDescriptor> Properties { get; private set; }
+        public IDictionary<long, PropertyDescriptor> Properties { get; private set; }
 
         [ShouldSerialize]
-        public IDictionary<int, MethodDescriptor> Methods { get; private set; }
+        public IDictionary<long, MethodDescriptor> Methods { get; private set; }
 
         public object Object { get; private set; }
 

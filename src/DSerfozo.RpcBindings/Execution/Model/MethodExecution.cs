@@ -5,13 +5,13 @@ namespace DSerfozo.RpcBindings.Execution.Model
     public class MethodExecution<TMarshal>
     {
         [ShouldSerialize]
-        public int ExecutionId { get; set; }
+        public long ExecutionId { get; set; }
 
         [ShouldSerialize]
-        public int ObjectId { get; set; }
+        public long ObjectId { get; set; }
 
         [ShouldSerialize]
-        public int MethodId { get; set; }
+        public long MethodId { get; set; }
 
         [ShouldSerialize]
         public TMarshal[] Parameters { get; set; }

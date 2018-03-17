@@ -97,7 +97,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Serialization
                     var id = callbackRegistry.Save(frameId, callback);
 
                     list.SetInt(0, (int)CefTypes.Callback);
-                    list.SetInt(1, id);
+                    list.SetInt64(1, id);
 
                     result.SetList(list);
                 }

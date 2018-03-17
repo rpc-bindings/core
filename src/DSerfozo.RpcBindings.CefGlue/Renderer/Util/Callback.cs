@@ -57,7 +57,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Util
             
         }
 
-        private void CallbackDone(PromiseResult promiseResult, CefBrowser browser, int executionId)
+        private void CallbackDone(PromiseResult promiseResult, CefBrowser browser, long executionId)
         {
             var callbackResult = new CallbackResult<CefValue>
             {

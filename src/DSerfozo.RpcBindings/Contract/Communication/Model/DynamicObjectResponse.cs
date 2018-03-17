@@ -5,7 +5,7 @@ namespace DSerfozo.RpcBindings.Contract.Communication.Model
     public class DynamicObjectResponse
     {
         [ShouldSerialize]
-        public int ExecutionId { get; set; }
+        public long ExecutionId { get; set; }
 
         [ShouldSerialize]
         public bool Success { get; set; }

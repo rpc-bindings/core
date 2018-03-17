@@ -5,7 +5,7 @@ namespace DSerfozo.RpcBindings.Execution.Model
     public class CallbackResult<TMarshal>
     {
         [ShouldSerialize]
-        public int ExecutionId { get; set; }
+        public long ExecutionId { get; set; }
 
         [ShouldSerialize]
         public string Error { get; set; }

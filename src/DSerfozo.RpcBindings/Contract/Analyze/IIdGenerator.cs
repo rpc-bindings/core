@@ -2,6 +2,6 @@
 {
     public interface IIdGenerator
     {
-        int GetNextId();
+        long GetNextId();
     }
 }

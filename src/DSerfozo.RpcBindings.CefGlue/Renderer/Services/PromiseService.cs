@@ -76,7 +76,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Services
             {
                 var userData = s.GetUserData() as PromiseUserData;
                 var waitForPromise = userData.WaitForPromise;
-                using (var idValue = CefV8Value.CreateInt(id))
+                using (var idValue = CefV8Value.CreateString(id.ToString()))
                 {
                     waitForPromise.ExecuteFunctionWithContext(context, null, new[] { promise, idValue }).Dispose();
                 }
@@ -85,9 +85,10 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Services
 
         private void OnNextPromiseResult(PromiseResult promiseResult)
         {
-            if (pendingPromises.Has(promiseResult.Id))
+            var id = Int64.Parse(promiseResult.Id);
+            if (pendingPromises.Has(id))
             {
-                var pendingPromise = pendingPromises.Get(promiseResult.Id);
+                var pendingPromise = pendingPromises.Get(id);
                 pendingPromise.Continuation(promiseResult);
             }
         }

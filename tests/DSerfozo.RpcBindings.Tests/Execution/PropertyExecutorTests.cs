@@ -17,7 +17,7 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                var propertyExecutor = new PropertyExecutor<object>(new ReadOnlyDictionary<int, ObjectDescriptor>(new Dictionary<int, ObjectDescriptor>()), new NoopObjectParameterBinder());
+                var propertyExecutor = new PropertyExecutor<object>(new ReadOnlyDictionary<long, ObjectDescriptor>(new Dictionary<long, ObjectDescriptor>()), new NoopObjectParameterBinder());
                 propertyExecutor.Execute(new PropertyGetExecution ()
                 {
                     ObjectId = 1
@@ -30,7 +30,7 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                var propertyExecutor = new PropertyExecutor<object>(new ReadOnlyDictionary<int, ObjectDescriptor>(new Dictionary<int, ObjectDescriptor>()), new NoopObjectParameterBinder());
+                var propertyExecutor = new PropertyExecutor<object>(new ReadOnlyDictionary<long, ObjectDescriptor>(new Dictionary<long, ObjectDescriptor>()), new NoopObjectParameterBinder());
                 propertyExecutor.Execute(new PropertySetExecution<object>()
                 {
                     ObjectId = 1
@@ -44,8 +44,8 @@ namespace DSerfozo.RpcBindings.Tests.Execution
             Assert.Throws<InvalidOperationException>(() =>
             {
                 var propertyExecutor = new PropertyExecutor<object>(
-                    new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>()
+                    new ReadOnlyDictionary<long, ObjectDescriptor>(
+                        new Dictionary<long, ObjectDescriptor>()
                         {
                             { 1, ObjectDescriptor.Create().WithProperties(new List<PropertyDescriptor>()).WithId(1).Get() }
                         }), new NoopObjectParameterBinder());
@@ -63,8 +63,8 @@ namespace DSerfozo.RpcBindings.Tests.Execution
             Assert.Throws<InvalidOperationException>(() =>
             {
                 var propertyExecutor = new PropertyExecutor<object>(
-                    new ReadOnlyDictionary<int, ObjectDescriptor>(
-                        new Dictionary<int, ObjectDescriptor>()
+                    new ReadOnlyDictionary<long, ObjectDescriptor>(
+                        new Dictionary<long, ObjectDescriptor>()
                         {
                             { 1, ObjectDescriptor.Create().WithProperties(new List<PropertyDescriptor>()).WithId(1).Get() }
                         }), new NoopObjectParameterBinder());
@@ -83,8 +83,8 @@ namespace DSerfozo.RpcBindings.Tests.Execution
             const string message = "message";
 
             var propertyExecutor = new PropertyExecutor<object>(
-                new ReadOnlyDictionary<int, ObjectDescriptor>(
-                    new Dictionary<int, ObjectDescriptor>()
+                new ReadOnlyDictionary<long, ObjectDescriptor>(
+                    new Dictionary<long, ObjectDescriptor>()
                     {
                         { 1, ObjectDescriptor.Create().WithProperties(new List<PropertyDescriptor>(){ PropertyDescriptor.Create().WithId(2).WithGetter(o => throw new Exception(message)).Get() }).WithId(1).Get() }
                     }), new NoopObjectParameterBinder());
@@ -105,8 +105,8 @@ namespace DSerfozo.RpcBindings.Tests.Execution
             const string message = "message";
 
             var propertyExecutor = new PropertyExecutor<object>(
-                new ReadOnlyDictionary<int, ObjectDescriptor>(
-                    new Dictionary<int, ObjectDescriptor>()
+                new ReadOnlyDictionary<long, ObjectDescriptor>(
+                    new Dictionary<long, ObjectDescriptor>()
                     {
                         { 1, ObjectDescriptor.Create().WithProperties(new List<PropertyDescriptor>(){ PropertyDescriptor.Create().WithId(2).WithSetter((o, o1) => throw new Exception(message)).Get() }).WithId(1).Get() }
                     }), new NoopObjectParameterBinder());
@@ -127,8 +127,8 @@ namespace DSerfozo.RpcBindings.Tests.Execution
             const string message = "message";
 
             var propertyExecutor = new PropertyExecutor<object>(
-                new ReadOnlyDictionary<int, ObjectDescriptor>(
-                    new Dictionary<int, ObjectDescriptor>()
+                new ReadOnlyDictionary<long, ObjectDescriptor>(
+                    new Dictionary<long, ObjectDescriptor>()
                     {
                         { 1, ObjectDescriptor.Create().WithProperties(new List<PropertyDescriptor>(){ PropertyDescriptor.Create().WithId(2).WithGetter(o => throw new Exception(message)).Get() }).WithId(1).Get() }
                     }), new NoopObjectParameterBinder());
@@ -149,8 +149,8 @@ namespace DSerfozo.RpcBindings.Tests.Execution
             const string message = "message";
 
             var propertyExecutor = new PropertyExecutor<object>(
-                new ReadOnlyDictionary<int, ObjectDescriptor>(
-                    new Dictionary<int, ObjectDescriptor>()
+                new ReadOnlyDictionary<long, ObjectDescriptor>(
+                    new Dictionary<long, ObjectDescriptor>()
                     {
                         { 1, ObjectDescriptor.Create().WithProperties(new List<PropertyDescriptor>(){ PropertyDescriptor.Create().WithId(2).WithGetter(o => throw new Exception(message)).Get() }).WithId(1).Get() }
                     }), new NoopObjectParameterBinder());

@@ -78,7 +78,7 @@ namespace DSerfozo.RpcBindings.Json.Tests
             var callbackFactoryMock = Mock.Get(callbackFactory);
             var binder = new JsonBinder(new JsonSerializer(), callbackFactory);
 
-            callbackFactoryMock.Setup(_ => _.CreateCallback(It.IsAny<int>(), null, binder)).Returns(Mock.Of<ICallback>());
+            callbackFactoryMock.Setup(_ => _.CreateCallback(9, null, binder)).Returns(Mock.Of<ICallback>());
 
             var actual = binder.BindToNet(new ParameterBinding<JToken>
             {

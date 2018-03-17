@@ -25,7 +25,7 @@ namespace DSerfozo.RpcBindings.Execution
 
         }
 
-        private readonly IDictionary<int, PendingExecution> callbacksInProgress = new Dictionary<int, PendingExecution>();
+        private readonly IDictionary<long, PendingExecution> callbacksInProgress = new Dictionary<long, PendingExecution>();
         private readonly ISubject<CallbackExecution<TMarshal>> callbackExecutionSubject = new Subject<CallbackExecution<TMarshal>>();
         private readonly ISubject<DeleteCallback> deleteSubject = new Subject<DeleteCallback>();
         private readonly IIdGenerator idGenerator;
@@ -75,7 +75,7 @@ namespace DSerfozo.RpcBindings.Execution
             return pending.Tcs.Task;
         }
 
-        public void DeleteCallback(int id)
+        public void DeleteCallback(long id)
         {
             if (!CanExecute)
             {

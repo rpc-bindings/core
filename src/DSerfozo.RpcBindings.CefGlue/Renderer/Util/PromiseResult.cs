@@ -4,7 +4,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Util
 {
     public class PromiseResult
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public bool Success { get; set; }
 

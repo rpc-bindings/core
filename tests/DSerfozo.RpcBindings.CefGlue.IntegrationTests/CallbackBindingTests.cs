@@ -19,9 +19,9 @@ namespace DSerfozo.RpcBindings.CefGlue.IntegrationTests
 
         public class TestClass
         {
-            private int id;
+            private long id;
 
-            public int Id => id;
+            public long Id => id;
 
             public void TestCallback(ICallback callback, string input)
             {

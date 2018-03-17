@@ -11,11 +11,11 @@ namespace DSerfozo.RpcBindings
     public class BindingRepository : IBindingRepository
     {
         private readonly ISet<IDisposable> disposables = new HashSet<IDisposable>();
-        private readonly IDictionary<int, ObjectDescriptor> objects = new Dictionary<int, ObjectDescriptor>();
+        private readonly IDictionary<long, ObjectDescriptor> objects = new Dictionary<long, ObjectDescriptor>();
         private readonly ObjectAnalyzer objectAnalyzer;
         private bool disposed;
 
-        public IReadOnlyDictionary<int, ObjectDescriptor> Objects => new ReadOnlyDictionary<int, ObjectDescriptor>(objects);
+        public IReadOnlyDictionary<long, ObjectDescriptor> Objects => new ReadOnlyDictionary<long, ObjectDescriptor>(objects);
 
         public BindingRepository(IIdGenerator idGenerator)
         {

@@ -38,9 +38,9 @@ namespace DSerfozo.RpcBindings.Marshaling
 
         protected abstract object BindInternal(ParameterBinding<TMarshal> binding);
 
-        protected abstract int? RetrieveFunctionId(TMarshal marshal);
+        protected abstract long? RetrieveFunctionId(TMarshal marshal);
 
-        private object CreateCallback(Type delegateType, int functionId)
+        private object CreateCallback(Type delegateType, long functionId)
         {
             return callbackFactory.CreateCallback(functionId, delegateType, this);
         }

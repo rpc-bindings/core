@@ -70,7 +70,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Handlers
                     var res = arguments[2];
                     PromiseResult?.Invoke(new PromiseResult
                     {
-                        Id = id.GetIntValue(),
+                        Id = id.GetStringValue(),
                         Success = success.GetBoolValue(),
                         Error = error.IsString ? error.GetStringValue() : null,
                         Result = res,

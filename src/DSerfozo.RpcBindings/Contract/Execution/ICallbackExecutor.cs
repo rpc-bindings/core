@@ -11,6 +11,6 @@ namespace DSerfozo.RpcBindings.Contract
 
         Task<object> Execute(CallbackExecutionParameters<TMarshal> execute);
 
-        void DeleteCallback(int id);
+        void DeleteCallback(long id);
     }
 }

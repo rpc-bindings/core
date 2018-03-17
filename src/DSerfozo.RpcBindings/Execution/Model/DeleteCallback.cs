@@ -5,6 +5,6 @@ namespace DSerfozo.RpcBindings.Execution.Model
     public class DeleteCallback
     {
         [ShouldSerialize]
-        public int FunctionId { get; set; }
+        public long FunctionId { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Binding
 {
     public class ObjectBinder
     {
-        private readonly IDictionary<int, FunctionBinder> functions;
+        private readonly IDictionary<long, FunctionBinder> functions;
 
         public ObjectBinder(ObjectDescriptor descriptor, V8Serializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
         {

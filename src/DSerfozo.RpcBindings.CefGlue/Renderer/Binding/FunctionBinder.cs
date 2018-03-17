@@ -8,12 +8,12 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Binding
 {
     public class FunctionBinder
     {
-        private readonly int objectId;
+        private readonly long objectId;
         private readonly MethodDescriptor descriptor;
         private readonly V8Serializer v8Serializer;
         private readonly SavedValueFactory<Promise> functionCallRegistry;
 
-        public FunctionBinder(int objectId, MethodDescriptor descriptor, V8Serializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
+        public FunctionBinder(long objectId, MethodDescriptor descriptor, V8Serializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
         {
             this.objectId = objectId;
             this.descriptor = descriptor;

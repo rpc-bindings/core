@@ -12,12 +12,12 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Handlers
 {
     public class FunctionHandler : CefV8Handler
     {
-        private readonly int objectId;
+        private readonly long objectId;
         private readonly MethodDescriptor descriptor;
         private readonly V8Serializer v8Serializer;
         private readonly SavedValueFactory<Promise> functionCallRegistry;
 
-        public FunctionHandler(int objectId, MethodDescriptor descriptor, V8Serializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
+        public FunctionHandler(long objectId, MethodDescriptor descriptor, V8Serializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
         {
             this.objectId = objectId;
             this.descriptor = descriptor;

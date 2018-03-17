@@ -5,10 +5,10 @@ namespace DSerfozo.RpcBindings.Execution.Model
     public class CallbackExecution<TMarshal>
     {
         [ShouldSerialize]
-        public int ExecutionId { get; set; }
+        public long ExecutionId { get; set; }
 
         [ShouldSerialize]
-        public int FunctionId { get; set; }
+        public long FunctionId { get; set; }
 
         [ShouldSerialize]
         public TMarshal[] Parameters { get; set; }

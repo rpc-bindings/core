@@ -26,7 +26,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Browser
             return ObjectSerializer.Deserialize(binding.Value, binding.TargetType);
         }
 
-        protected override int? RetrieveFunctionId(CefValue marshal)
+        protected override long? RetrieveFunctionId(CefValue marshal)
         {
             if (marshal.GetValueType() == CefValueType.List)
             {
@@ -34,7 +34,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Browser
                 {
                     if (cefList.Count == 2 && (CefTypes)cefList.GetInt(0) == CefTypes.Callback)
                     {
-                        return cefList.GetInt(1);
+                        return cefList.GetInt64(1);
                     }
                 }
             }

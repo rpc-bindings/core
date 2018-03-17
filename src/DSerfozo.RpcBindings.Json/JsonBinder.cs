@@ -45,7 +45,7 @@ namespace DSerfozo.RpcBindings.Json
             return result;
         }
 
-        protected override int? RetrieveFunctionId(JToken marshal)
+        protected override long? RetrieveFunctionId(JToken marshal)
         {
             return marshal.ToObject<CallbackParameter>(serializer).FunctionId;
         }
