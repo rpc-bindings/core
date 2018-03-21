@@ -5,19 +5,22 @@ using System.Reflection;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Execution.Model;
+using DSerfozo.RpcBindings.Extensions;
 using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings.Execution
 {
-    public class MethodExecutor<TMarshal> : IMethodExecutor<TMarshal>
+    public class MethodExecutor<TMarshal> : IMethodExecutor<TMarshal>, IBinder<TMarshal>
     {
         private readonly IReadOnlyDictionary<long, ObjectDescriptor> objects;
-        private readonly IParameterBinder<TMarshal> parameterBinder;
+        private readonly BindingDelegate<TMarshal> bindingDelegate;
 
-        public MethodExecutor(IReadOnlyDictionary<long, ObjectDescriptor> objects, IParameterBinder<TMarshal> parameterBinder)
+        BindingDelegate<TMarshal> IBinder<TMarshal>.Binder => bindingDelegate;
+
+        public MethodExecutor(IReadOnlyDictionary<long, ObjectDescriptor> objects, BindingDelegate<TMarshal> bindingDelegate)
         {
             this.objects = objects;
-            this.parameterBinder = parameterBinder;
+            this.bindingDelegate = bindingDelegate;
         }
 
         public async Task<MethodResult<TMarshal>> Execute(MethodExecution<TMarshal> methodExcecution)
@@ -45,17 +48,14 @@ namespace DSerfozo.RpcBindings.Execution
             var parameters = methodDescriptor.Parameters.ToArray();
 
             var actualParameters = methodExcecution.Parameters.ToList();
-            List<ParameterBinding<TMarshal>> parameterBindings = new List<ParameterBinding<TMarshal>>();
-            for (var i = 0; i < parameters.Length; i++)
-            {
-                parameterBindings.Add(new ParameterBinding<TMarshal>
+            var parameterBindings = parameters.Select((t, i) => new Binding<TMarshal>
                 {
-                    TargetType = parameters[i].Type,
-                    Value = (TMarshal)actualParameters[i]
-                });
-            }
+                    TargetType = t.Type,
+                    Value = actualParameters[i]
+                })
+                .ToList();
 
-            var boundParameters = parameterBindings.Select(p => parameterBinder.BindToNet(p)).ToList();
+            var boundParameters = parameterBindings.Select(this.BindToNet).ToList();
 
             var parameterTypes = boundParameters.Count > 0 ? boundParameters.Select(p => p?.GetType()).ToArray() : new Type[] { };
             for (var i = 0; i < parameterTypes.Length; i++)
@@ -78,7 +78,7 @@ namespace DSerfozo.RpcBindings.Execution
 
                     if (executeResult.GetType().IsGenericType)
                     {
-                        actualResult = executeResult.GetType().GetProperty(nameof(Task<object>.Result)).GetValue(executeResult);
+                        actualResult = executeResult.GetType().GetProperty(nameof(Task<object>.Result))?.GetValue(executeResult);
                     }
                 }
                 else
@@ -86,7 +86,7 @@ namespace DSerfozo.RpcBindings.Execution
                     actualResult = executeResult;
                 }
 
-                result.Result = parameterBinder.BindToWire(actualResult);
+                result.Result = this.BindToWire(actualResult);
 
                 result.Success = true;
             }

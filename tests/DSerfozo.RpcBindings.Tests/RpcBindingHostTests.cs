@@ -20,8 +20,8 @@ namespace DSerfozo.RpcBindings.Tests
         private class TestHost : RpcBindingHost<object>
         {
             public TestHost(IConnection<object> connection,
-                Func<ICallbackFactory<object>, IParameterBinder<object>> parameterBinderFactory,
-                IScheduler baseScheduler) : base(connection, parameterBinderFactory,
+                IPlatformBinder<object> parameterBinder,
+                IScheduler baseScheduler) : base(connection, parameterBinder,
                 baseScheduler)
             {
             }
@@ -51,7 +51,7 @@ namespace DSerfozo.RpcBindings.Tests
             var connection = Mock.Of<IConnection<object>>();
 
             IBindingRepository bindingRepository;
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), new TestScheduler()))
+            using (var host = new TestHost(connection, new NoopObjectPlatformBinder(), new TestScheduler()))
             {
                 bindingRepository = host.Repository;
             }
@@ -67,7 +67,7 @@ namespace DSerfozo.RpcBindings.Tests
             IBindingRepository bindingRepository;
             var baseSchedulerMock = new Mock<IScheduler>();
             var disp = baseSchedulerMock.As<IDisposable>();
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseSchedulerMock.Object))
+            using (var host = new TestHost(connection, new NoopObjectPlatformBinder(), baseSchedulerMock.Object))
             {
                 bindingRepository = host.Repository;
             }
@@ -80,7 +80,7 @@ namespace DSerfozo.RpcBindings.Tests
         {
             var baseScheduler= new TestScheduler();
             var connection = new ConnectionStub();
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
+            using (var host = new TestHost(connection, new NoopObjectPlatformBinder(), baseScheduler))
             {
                 host.ResolvingBoundObject += (s, args) =>
                 {
@@ -109,7 +109,7 @@ namespace DSerfozo.RpcBindings.Tests
             var connectionMock = Mock.Get(connection);
 
             var baseScheduler = new TestScheduler();
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
+            using (var host = new TestHost(connection, new NoopObjectPlatformBinder(), baseScheduler))
             {
                 host.ResolvingBoundObject += (s, args) =>
                 {
@@ -142,7 +142,7 @@ namespace DSerfozo.RpcBindings.Tests
 
             var baseScheduler = new TestScheduler();
             var connection = new ConnectionStub();
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
+            using (var host = new TestHost(connection, new NoopObjectPlatformBinder(), baseScheduler))
             {
                 host.ResolvingBoundObject += (s, args) =>
                 {
@@ -174,7 +174,7 @@ namespace DSerfozo.RpcBindings.Tests
 
             var baseScheduler = new TestScheduler();
             var connection = new ConnectionStub();
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
+            using (var host = new TestHost(connection, new NoopObjectPlatformBinder(), baseScheduler))
             {
                 host.ResolvingBoundObject += (s, args) =>
                 {
@@ -205,7 +205,7 @@ namespace DSerfozo.RpcBindings.Tests
             var connectionMock = Mock.Get(connection);
 
             var baseScheduler = new TestScheduler();
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
+            using (var host = new TestHost(connection, new NoopObjectPlatformBinder(), baseScheduler))
             {
                 host.ResolvingBoundObject += (s, args) => throw new Exception("Error");
 
@@ -234,7 +234,7 @@ namespace DSerfozo.RpcBindings.Tests
             var connectionMock = Mock.Get(connection);
 
             var baseScheduler = new TestScheduler();
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
+            using (var host = new TestHost(connection, new NoopObjectPlatformBinder(), baseScheduler))
             {
                 baseScheduler.Start();
                 connection.IncomingSubject.OnNext(new RpcResponse<object>
@@ -260,7 +260,7 @@ namespace DSerfozo.RpcBindings.Tests
             var connectionMock = Mock.Get(connection);
 
             var baseScheduler = new TestScheduler();
-            using (var host = new TestHost(connection, factory => new NoopObjectParameterBinder(), baseScheduler))
+            using (var host = new TestHost(connection, new NoopObjectPlatformBinder(), baseScheduler))
             {
                 var desc = host.Repository.AddBinding("testObj", new object());
 

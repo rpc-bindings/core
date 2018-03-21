@@ -16,7 +16,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
             var executorMock = Mock.Get(executor);
             executorMock.SetupGet(_ => _.CanExecute).Returns(true);
 
-            new Callback<object>(1, executor, Mock.Of<IParameterBinder<object>>()).Dispose();
+            new Callback<object>(1, executor, context => { }).Dispose();
 
             executorMock.Verify(_ => _.DeleteCallback(1));
         }
@@ -28,7 +28,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
             var executorMock = Mock.Get(executor);
             executorMock.SetupGet(_ => _.CanExecute).Returns(false);
 
-            new Callback<object>(1, executor, Mock.Of<IParameterBinder<object>>()).Dispose();
+            new Callback<object>(1, executor, context => { }).Dispose();
 
             executorMock.Verify(_ => _.DeleteCallback(It.IsAny<int>()), Times.Never);
         }
@@ -39,7 +39,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
             var executor = Mock.Of<ICallbackExecutor<object>>();
             var executorMock = Mock.Get(executor);
 
-            var callback = new Callback<object>(1, executor, Mock.Of<IParameterBinder<object>>());
+            var callback = new Callback<object>(1, executor, context => { });
             callback.Dispose();
 
             Assert.False(callback.CanExecute);
@@ -52,7 +52,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
             var executorMock = Mock.Get(executor);
             executorMock.SetupGet(_ => _.CanExecute).Returns(false);
 
-            var callback = new Callback<object>(1, executor, Mock.Of<IParameterBinder<object>>());
+            var callback = new Callback<object>(1, executor, context => { });
 
             Assert.False(callback.CanExecute);
         }
@@ -62,12 +62,15 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
         {
             var executor = Mock.Of<ICallbackExecutor<object>>();
             var executorMock = Mock.Get(executor);
-            executorMock.Setup(_ => _.Execute(It.Is<CallbackExecutionParameters<object>>(o => o.Parameters.Length == 1 && o.Binder is NoopObjectParameterBinder))).Returns(Task.FromResult(new object()));
+            BindingDelegate<object> parameterBinder = context => { };
+            executorMock
+                .Setup(_ => _.Execute(It.Is<CallbackExecutionParameters<object>>(o =>
+                    o.Parameters.Length == 1 && o.Binder == parameterBinder))).Returns(Task.FromResult(new object()));
             executorMock.SetupGet(_ => _.CanExecute).Returns(true);
 
-            var callback = new Callback<object>(1, executor, new NoopObjectParameterBinder());
+            var callback = new Callback<object>(1, executor, parameterBinder);
 
-            var result = await callback.ExecuteAsync(new object[] { "str" });
+            var result = await callback.ExecuteAsync("str");
 
             Assert.NotNull(result);
         }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
-using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -21,8 +19,8 @@ namespace DSerfozo.RpcBindings.Json.Tests
         [Fact]
         public void IntConverted()
         {
-            var binder = new JsonBinder(new JsonSerializer(), Mock.Of<ICallbackFactory<JToken>>());
-            var actual = binder.BindToNet(new ParameterBinding<JToken>
+            var binder = new JsonBinder(new JsonSerializer());
+            var actual = binder.BindToNet(new Binding<JToken>
             {
                 TargetType = typeof(Int32),
                 Value = JToken.Parse("1") as JToken
@@ -34,8 +32,8 @@ namespace DSerfozo.RpcBindings.Json.Tests
         [Fact]
         public void FloatConverted()
         {
-            var binder = new JsonBinder(new JsonSerializer(), Mock.Of<ICallbackFactory<JToken>>());
-            var actual = binder.BindToNet(new ParameterBinding<JToken>
+            var binder = new JsonBinder(new JsonSerializer());
+            var actual = binder.BindToNet(new Binding<JToken>
             {
                 TargetType = typeof(Single),
                 Value = JToken.Parse("1.23") as JToken
@@ -47,8 +45,8 @@ namespace DSerfozo.RpcBindings.Json.Tests
         [Fact]
         public void StringConverted()
         {
-            var binder = new JsonBinder(new JsonSerializer(), Mock.Of<ICallbackFactory<JToken>>());
-            var actual = binder.BindToNet(new ParameterBinding<JToken>
+            var binder = new JsonBinder(new JsonSerializer());
+            var actual = binder.BindToNet(new Binding<JToken>
             {
                 TargetType = typeof(string),
                 Value = JToken.Parse("\"text\"") as JToken
@@ -60,8 +58,8 @@ namespace DSerfozo.RpcBindings.Json.Tests
         [Fact]
         public void ComplexTypeConverted()
         {
-            var binder = new JsonBinder(new JsonSerializer(), Mock.Of<ICallbackFactory<JToken>>());
-            var actual = binder.BindToNet(new ParameterBinding<JToken>
+            var binder = new JsonBinder(new JsonSerializer());
+            var actual = binder.BindToNet(new Binding<JToken>
             {
                 TargetType = typeof(ComplexType),
                 Value = JToken.Parse("{\"String\":\"text\", \"Int\": 9}") as JToken
@@ -72,28 +70,10 @@ namespace DSerfozo.RpcBindings.Json.Tests
         }
 
         [Fact]
-        public void CallbackConverted()
-        {
-            var callbackFactory = Mock.Of<ICallbackFactory<JToken>>();
-            var callbackFactoryMock = Mock.Get(callbackFactory);
-            var binder = new JsonBinder(new JsonSerializer(), callbackFactory);
-
-            callbackFactoryMock.Setup(_ => _.CreateCallback(9, null, binder)).Returns(Mock.Of<ICallback>());
-
-            var actual = binder.BindToNet(new ParameterBinding<JToken>
-            {
-                TargetType = typeof(ICallback),
-                Value = JToken.Parse("{\"functionId\":9}") as JToken
-            });
-
-            Assert.IsAssignableFrom<ICallback>(actual);
-        }
-
-        [Fact]
         public void EmptyTargetType()
         {
-            var binder = new JsonBinder(new JsonSerializer(), Mock.Of<ICallbackFactory<JToken>>());
-            var actual = binder.BindToNet(new ParameterBinding<JToken>
+            var binder = new JsonBinder(new JsonSerializer());
+            var actual = binder.BindToNet(new Binding<JToken>
             {
                 Value = JToken.Parse("{\"id\":9, \"sub\":{\"test\":\"sad\"}}") as JToken
             });
@@ -105,8 +85,8 @@ namespace DSerfozo.RpcBindings.Json.Tests
         [Fact]
         public void EmptyTargetTypePrimitivePayload()
         {
-            var binder = new JsonBinder(new JsonSerializer(), Mock.Of<ICallbackFactory<JToken>>());
-            var actual = binder.BindToNet(new ParameterBinding<JToken>
+            var binder = new JsonBinder(new JsonSerializer());
+            var actual = binder.BindToNet(new Binding<JToken>
             {
                 Value = JToken.Parse("\"data\"") as JToken
             });
@@ -117,31 +97,13 @@ namespace DSerfozo.RpcBindings.Json.Tests
         [Fact]
         public void NullValue()
         {
-            var binder = new JsonBinder(new JsonSerializer(), Mock.Of<ICallbackFactory<JToken>>());
-            var actual = binder.BindToNet(new ParameterBinding<JToken>
+            var binder = new JsonBinder(new JsonSerializer());
+            var actual = binder.BindToNet(new Binding<JToken>
             {
                 
             });
 
             Assert.Null(actual);
-        }
-
-        [Fact]
-        public void DelegateTypeGenerated()
-        {
-            var callbackFactory = Mock.Of<ICallbackFactory<JToken>>();
-            var callbackFactoryMock = Mock.Get(callbackFactory);
-
-            var binder = new JsonBinder(new JsonSerializer(), callbackFactory);
-            callbackFactoryMock.Setup(_ => _.CreateCallback(9, typeof(Func<string, Task<string>>), binder)).Returns((object)new Func<string, Task<string>>(s => null));
-
-            var actual = binder.BindToNet(new ParameterBinding<JToken>
-            {
-                TargetType = typeof(Func<string, Task<string>>),
-                Value = JToken.Parse("{\"functionId\":9}") as JToken
-            });
-
-            Assert.IsAssignableFrom<MulticastDelegate>(actual);
         }
     }
 }

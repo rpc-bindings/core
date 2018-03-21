@@ -8,13 +8,13 @@ namespace DSerfozo.RpcBindings.Json
 {
     public class JsonRpcBindingHost : RpcBindingHost<JToken>
     {
-        private static readonly JsonSerializer JsonSerializer = new JsonSerializer()
+        private static readonly JsonSerializer JsonSerializer = new JsonSerializer
         {
             ContractResolver = new ShouldSerializeContractResolver()
         };
 
         public JsonRpcBindingHost(Func<JsonSerializer, IConnection<JToken>> connectionFactory)
-            :base(connectionFactory(JsonSerializer), factory => new JsonBinder(JsonSerializer, factory), new EventLoopScheduler())
+            :base(connectionFactory(JsonSerializer), new JsonBinder(JsonSerializer), new EventLoopScheduler())
         {
             
         }

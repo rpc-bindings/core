@@ -2,9 +2,9 @@
 
 namespace DSerfozo.RpcBindings.Marshaling
 {
-    public class NoopObjectParameterBinder : IParameterBinder<object>
+    public class NoopObjectPlatformBinder : IPlatformBinder<object>
     {
-        public object BindToNet(ParameterBinding<object> binding)
+        public object BindToNet(Binding<object> binding)
         {
             return binding.Value;
         }

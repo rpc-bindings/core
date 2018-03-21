@@ -14,7 +14,7 @@ namespace DSerfozo.RpcBindings.Marshaling
             this.callbackExecutor = callbackExecutor;
         }
 
-        public object CreateCallback(long id, Type delegateType, IParameterBinder<TMarshal> parameterBinder)
+        public object CreateCallback(long id, Type delegateType, BindingDelegate<TMarshal> parameterBinder)
         {
             if(delegateType == null)
             {
@@ -26,12 +26,12 @@ namespace DSerfozo.RpcBindings.Marshaling
             }
         }
 
-        private Delegate Create(long id, Type delegateType, IParameterBinder<TMarshal> parameterBinder)
+        private Delegate Create(long id, Type delegateType, BindingDelegate<TMarshal> parameterBinder)
         {
             return generator.Generate(delegateType, id, callbackExecutor, parameterBinder);
         }
 
-        private ICallback Create(long id, IParameterBinder<TMarshal> parameterBinder)
+        private ICallback Create(long id, BindingDelegate<TMarshal> parameterBinder)
         {
             return new Callback<TMarshal>(id, callbackExecutor, parameterBinder);
         }

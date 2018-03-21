@@ -1,27 +1,25 @@
 ﻿using System.Collections.Generic;
 using DSerfozo.RpcBindings.Contract;
-using DSerfozo.RpcBindings.Json.Model;
-using DSerfozo.RpcBindings.Marshaling;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DSerfozo.RpcBindings.Json
 {
-    public class JsonBinder : CallbackAwareBinder<JToken>
+    public class JsonBinder : IPlatformBinder<JToken>
     {
         private readonly JsonSerializer serializer;
 
-        public JsonBinder(JsonSerializer serializer, ICallbackFactory<JToken> callbackFactory) : base(callbackFactory)
+        public JsonBinder(JsonSerializer serializer)
         {
             this.serializer = serializer;
         }
 
-        public override JToken BindToWire(object obj)
+        public JToken BindToWire(object obj)
         {
             return JToken.FromObject(obj, serializer);
         }
 
-        protected override object BindInternal(ParameterBinding<JToken> binding)
+        public object BindToNet(Binding<JToken> binding)
         {
             object result = null;
             var val = binding.Value;
@@ -43,11 +41,6 @@ namespace DSerfozo.RpcBindings.Json
             }
 
             return result;
-        }
-
-        protected override long? RetrieveFunctionId(JToken marshal)
-        {
-            return marshal.ToObject<CallbackParameter>(serializer).FunctionId;
         }
     }
 }

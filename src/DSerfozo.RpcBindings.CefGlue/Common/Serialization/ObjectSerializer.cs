@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using DSerfozo.RpcBindings.Contract.Model;
 using Xilium.CefGlue;
 
 namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
@@ -295,6 +296,13 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
                             }
 
                             result = array;
+                        }
+                        else if (targetType == typeof(CallbackDescriptor) && cefType == CefTypes.Callback)
+                        {
+                            result = new CallbackDescriptor
+                            {
+                                FunctionId = lstVal.GetInt64(1)
+                            };
                         }
                     }
                     break;

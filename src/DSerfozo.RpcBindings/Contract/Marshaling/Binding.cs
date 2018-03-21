@@ -2,7 +2,7 @@
 
 namespace DSerfozo.RpcBindings.Contract
 {
-    public class ParameterBinding<T>
+    public class Binding<T>
     {
         public Type TargetType { get; set; }
 

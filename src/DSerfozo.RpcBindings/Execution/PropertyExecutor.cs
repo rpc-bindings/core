@@ -2,19 +2,22 @@
 using System.Collections.Generic;
 using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Execution.Model;
+using DSerfozo.RpcBindings.Extensions;
 using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings.Execution
 {
-    public class PropertyExecutor<TMarshal> : IPropertyExecutor<TMarshal>
+    public class PropertyExecutor<TMarshal> : IPropertyExecutor<TMarshal>, IBinder<TMarshal>
     {
         private readonly IReadOnlyDictionary<long, ObjectDescriptor> objects;
-        private readonly IParameterBinder<TMarshal> parameterBinder;
+        private readonly BindingDelegate<TMarshal> binder;
 
-        public PropertyExecutor(IReadOnlyDictionary<long, ObjectDescriptor> objects, IParameterBinder<TMarshal> parameterBinder)
+        BindingDelegate<TMarshal> IBinder<TMarshal>.Binder => binder;
+
+        public PropertyExecutor(IReadOnlyDictionary<long, ObjectDescriptor> objects, BindingDelegate<TMarshal> binder)
         {
             this.objects = objects;
-            this.parameterBinder = parameterBinder;
+            this.binder = binder;
         }
 
         public PropertyGetSetResult<TMarshal> Execute(PropertyGetExecution propertyGetExecution)
@@ -28,7 +31,7 @@ namespace DSerfozo.RpcBindings.Execution
             try
             {
                 var getResult = propertyDescriptor.Getter(objectDescriptor.Object);
-                result.Value = parameterBinder.BindToWire(getResult);
+                result.Value = this.BindToWire(getResult);
                 result.Success = true;
             }
             catch (Exception e)
@@ -49,8 +52,8 @@ namespace DSerfozo.RpcBindings.Execution
             };
             try
             {
-                propertyDescriptor.Setter(objectDescriptor.Object, parameterBinder.BindToNet(
-                    new ParameterBinding<TMarshal>
+                propertyDescriptor.Setter(objectDescriptor.Object, this.BindToNet(
+                    new Binding<TMarshal>
                     {
                         Value = propertySetExecution.Value,
                         TargetType = propertyDescriptor.Type

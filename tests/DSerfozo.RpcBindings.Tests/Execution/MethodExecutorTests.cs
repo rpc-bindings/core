@@ -4,13 +4,14 @@ using DSerfozo.RpcBindings.Tests.Fixtures;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
+using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Execution;
 using DSerfozo.RpcBindings.Execution.Model;
 using Xunit;
 
-namespace DSerfozo.RpcBindings.Tests.Calling
+namespace DSerfozo.RpcBindings.Tests.Execution
 {
     public class MethodExecutorTests
     {
@@ -19,7 +20,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
         {
             return Assert.ThrowsAsync<InvalidOperationException>(async () => 
             {
-                var methodExecutor = new MethodExecutor<object>(new ReadOnlyDictionary<long, ObjectDescriptor>(new Dictionary<long, ObjectDescriptor>()), new NoopObjectParameterBinder());
+                var methodExecutor = new MethodExecutor<object>(new ReadOnlyDictionary<long, ObjectDescriptor>(new Dictionary<long, ObjectDescriptor>()), context => { });
                 await methodExecutor.Execute(new MethodExecution<object>()
                 {
                     ObjectId = 1
@@ -37,7 +38,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                         new Dictionary<long, ObjectDescriptor>()
                         {
                             { 1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()).WithId(1).Get() }
-                        }), new NoopObjectParameterBinder());
+                        }), context => { });
                 await methodExecutor.Execute(new MethodExecution<object>()
                 {
                     ObjectId = 1,
@@ -57,7 +58,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                             {
                                 MethodDescriptor.Create().WithId(2).WithParameterCount(2).Get()
                             }).WithId(1).Get() }
-                        }), new NoopObjectParameterBinder());
+                        }), context => { });
 
             var result = await methodExecutor.Execute(new MethodExecution<object>()
             {
@@ -84,7 +85,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                                     new MethodParameterDescriptor(typeof(string), false)
                                 }).Get()
                             }).WithId(1).Get() }
-                        }), new NoopObjectParameterBinder());
+                        }), context => { context.ObjectValue = context.NativeValue; });
 
             var result = await methodExecutor.Execute(new MethodExecution<object>()
             {
@@ -101,22 +102,30 @@ namespace DSerfozo.RpcBindings.Tests.Calling
         public async Task MethodCalled()
         {
             var methodExecutor = new MethodExecutor<object>(
-                    new ReadOnlyDictionary<long, ObjectDescriptor>(
-                        new Dictionary<long, ObjectDescriptor>()
+                new ReadOnlyDictionary<long, ObjectDescriptor>(
+                    new Dictionary<long, ObjectDescriptor>()
+                    {
                         {
-                            { 1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()
+                            1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()
                             {
                                 MethodDescriptor.Create()
-                                .WithId(2)
-                                .WithParameterCount(1)
-                                .WithParameters(new List<MethodParameterDescriptor>
-                                {
-                                    new MethodParameterDescriptor(typeof(string), false)
-                                })
-                                .WithExecute((o, a) => a[0] as string)
-                                .Get()
-                            }).WithId(1).Get() }
-                        }), new NoopObjectParameterBinder());
+                                    .WithId(2)
+                                    .WithParameterCount(1)
+                                    .WithParameters(new List<MethodParameterDescriptor>
+                                    {
+                                        new MethodParameterDescriptor(typeof(string), false)
+                                    })
+                                    .WithExecute((o, a) => a[0] as string)
+                                    .Get()
+                            }).WithId(1).Get()
+                        }
+                    }), context =>
+                {
+                    if (context.Direction == ObjectBindingDirection.In)
+                        context.ObjectValue = context.NativeValue;
+                    else
+                        context.NativeValue = context.ObjectValue;
+                });
 
             const string Value = "expected";
             const int ExecutionId = 3;
@@ -156,7 +165,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                                 .WithExecute((o, a) => method.Invoke(o, a))
                                 .Get()
                             }).WithId(1).Get() }
-                        }), new NoopObjectParameterBinder());
+                        }), context => { });
 
             var result = await methodExecutor.Execute(new MethodExecution<object>
             {
@@ -188,7 +197,12 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                                 .WithExecute((o, a) => Task.FromResult(a[0] as string))
                                 .Get()
                             }).WithId(1).Get() }
-                        }), new NoopObjectParameterBinder());
+                        }), context => {
+                    if (context.Direction == ObjectBindingDirection.In)
+                        context.ObjectValue = context.NativeValue;
+                    else
+                        context.NativeValue = context.ObjectValue;
+                });
 
             const string Value = "expected";
             var result = await methodExecutor.Execute(new MethodExecution<object>()
@@ -221,7 +235,7 @@ namespace DSerfozo.RpcBindings.Tests.Calling
                                 .WithExecute((o, a) => Task.FromException(new NotSupportedException("Error")))
                                 .Get()
                             }).WithId(1).Get() }
-                        }), new NoopObjectParameterBinder());
+                        }), context => { });
 
             const string Value = "expected";
             var result = await methodExecutor.Execute(new MethodExecution<object>()

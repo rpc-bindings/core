@@ -2,7 +2,7 @@
 
 namespace DSerfozo.RpcBindings.Contract.Model
 {
-    public class CallbackExecutionParameters<TMarshal>
+    public class CallbackExecutionParameters<TMarshal> : IBinder<TMarshal>
     {
         public long Id { get; set; }
 
@@ -10,6 +10,6 @@ namespace DSerfozo.RpcBindings.Contract.Model
 
         public Type ResultTargetType { get; set; }
 
-        public IParameterBinder<TMarshal> Binder { get; set; }
+        public BindingDelegate<TMarshal> Binder { get; set; }
     }
 }

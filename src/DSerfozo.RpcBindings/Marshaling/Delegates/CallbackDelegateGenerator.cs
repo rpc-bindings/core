@@ -14,7 +14,7 @@ namespace DSerfozo.RpcBindings.Marshaling.Delegates
 
         private readonly IDictionary<Type, Type> typeCache = new Dictionary<Type, Type>();
 
-        public Delegate Generate(Type delegateType, long id, ICallbackExecutor<TMarshal> callbackExecutor, IParameterBinder<TMarshal> parameterBinder)
+        public Delegate Generate(Type delegateType, long id, ICallbackExecutor<TMarshal> callbackExecutor, BindingDelegate<TMarshal> parameterBinder)
         {
             ValidateDelegateType(delegateType);
 
@@ -46,12 +46,12 @@ namespace DSerfozo.RpcBindings.Marshaling.Delegates
                               TypeAttributes.BeforeFieldInit
                               , null);
             typeBuilder.SetParent(typeof(DelegateContainerBase<TMarshal>));
-            var parentConstructor = typeof(DelegateContainerBase<TMarshal>).GetConstructor(new[] { typeof(long), typeof(ICallbackExecutor<TMarshal>), typeof(IParameterBinder<TMarshal>) });
+            var parentConstructor = typeof(DelegateContainerBase<TMarshal>).GetConstructor(new[] { typeof(long), typeof(ICallbackExecutor<TMarshal>), typeof(BindingDelegate<TMarshal>) });
             var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public |
                 MethodAttributes.HideBySig |
                 MethodAttributes.SpecialName |
                 MethodAttributes.RTSpecialName, CallingConventions.Standard |
-                CallingConventions.HasThis, new[] { typeof(long), typeof(ICallbackExecutor<TMarshal>), typeof(IParameterBinder<TMarshal>) });
+                CallingConventions.HasThis, new[] { typeof(long), typeof(ICallbackExecutor<TMarshal>), typeof(BindingDelegate<TMarshal>) });
             var constructorGenerator = constructorBuilder.GetILGenerator();
             constructorGenerator.Emit(OpCodes.Ldarg_0);
             constructorGenerator.Emit(OpCodes.Ldarg_1);

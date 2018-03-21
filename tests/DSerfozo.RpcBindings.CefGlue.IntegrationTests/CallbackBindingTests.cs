@@ -79,7 +79,7 @@ namespace DSerfozo.RpcBindings.CefGlue.IntegrationTests
                 await browser.RunTest("testCallbackDispose");
 
                 await Assert.ThrowsAsync<Exception>(() => new Callback<CefValue>(obj.Id, browser.BindingHost.CallbackExecutor,
-                    browser.BindingHost.ParameterBinder).ExecuteAsync());
+                    contet => { }).ExecuteAsync());
             }
         }
 

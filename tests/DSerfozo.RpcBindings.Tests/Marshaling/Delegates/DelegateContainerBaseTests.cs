@@ -9,18 +9,10 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling.Delegates
 {
     public class DelegateContainerBaseTests
     {
-        private class Shit
-        {
-            ~Shit()
-            {
-                
-            }
-        }
-
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void Sun(ICallbackExecutor<object> callbackExecutor)
         {
-            new DelegateContainerBase<object>(1, callbackExecutor, Mock.Of<IParameterBinder<object>>());
+            new DelegateContainerBase<object>(1, callbackExecutor, ctx => { });
         }
         
         [Fact]

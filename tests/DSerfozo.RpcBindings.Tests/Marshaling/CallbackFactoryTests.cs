@@ -15,7 +15,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
         {
             var callbackFactory = new CallbackFactory<object>(Mock.Of<ICallbackExecutor<object>>());
 
-            Assert.NotNull(callbackFactory.CreateCallback(1, null, new NoopObjectParameterBinder()));
+            Assert.NotNull(callbackFactory.CreateCallback(1, null, ctx => { }));
         }
 
         [Fact]
@@ -28,7 +28,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
             var callbackFactory = new CallbackFactory<object>(callbackExecutor);
 
             Func<string, Task<string>> del = (Func<string, Task<string>>) callbackFactory.CreateCallback(9,
-                typeof(Func<string, Task<string>>), Mock.Of<IParameterBinder<object>>());
+                typeof(Func<string, Task<string>>), ctx => { });
             Assert.Equal("result", await del("input"));
         }
     }

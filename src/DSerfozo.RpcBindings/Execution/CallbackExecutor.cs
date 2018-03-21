@@ -6,17 +6,19 @@ using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Contract.Model;
 using DSerfozo.RpcBindings.Execution.Model;
+using DSerfozo.RpcBindings.Extensions;
 
 namespace DSerfozo.RpcBindings.Execution
 {
     public class CallbackExecutor<TMarshal> : ICallbackExecutor<TMarshal>
     {
-        private class PendingExecution
+        private class PendingExecution : IBinder<TMarshal>
         {
             public TaskCompletionSource<object> Tcs { get; }
 
             public Type TargetType { get; set; }
-            public IParameterBinder<TMarshal> Binder { get; internal set; }
+
+            public BindingDelegate<TMarshal> Binder { get; internal set; }
 
             public PendingExecution()
             {
@@ -69,7 +71,7 @@ namespace DSerfozo.RpcBindings.Execution
             {
                 ExecutionId = nextId,
                 FunctionId = execute.Id,
-                Parameters = execute.Parameters.Select(s => execute.Binder.BindToWire(s)).ToArray(),
+                Parameters = execute.Parameters.Select(execute.BindToWire).ToArray(),
             });
 
             return pending.Tcs.Task;
@@ -94,7 +96,7 @@ namespace DSerfozo.RpcBindings.Execution
             {
                 if (callbackResult.Success)
                 {
-                    pending.Tcs.TrySetResult(pending.Binder.BindToNet(new ParameterBinding<TMarshal> { Value = callbackResult.Result, TargetType = pending.TargetType }));
+                    pending.Tcs.TrySetResult(pending.BindToNet(new Binding<TMarshal> { Value = callbackResult.Result, TargetType = pending.TargetType }));
                 }
                 else
                 {
