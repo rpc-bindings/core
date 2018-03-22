@@ -1,4 +1,5 @@
 ﻿using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Analyze;
 using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings.Analyze
@@ -16,27 +17,21 @@ namespace DSerfozo.RpcBindings.Analyze
             this.methodAnalyzer = methodAnalyzer;
         }
 
-        public ObjectDescriptor AnalyzeObject<TObject>(string name, TObject o)
-        {
-            return ObjectDescriptor.Create()
-                .WithId(idGenerator.GetNextId())
-                .WithMethods(methodAnalyzer.AnalyzeMethods(typeof(TObject)))
-                .WithProperties(propertyAnalyzer.AnalyzeProperties(typeof(TObject)))
-                .WithObject(o)
-                .WithName(name)
-                .Get();
-        }
-
-        public ObjectDescriptor AnalyzeObject(string name, object o)
+        public ObjectDescriptor AnalyzeObject(object o, AnalyzeOptions options)
         {
             var type = o.GetType();
-            return ObjectDescriptor.Create()
+            var builder = ObjectDescriptor.Create()
                 .WithId(idGenerator.GetNextId())
                 .WithMethods(methodAnalyzer.AnalyzeMethods(type))
-                .WithProperties(propertyAnalyzer.AnalyzeProperties(type))
-                .WithObject(o)
-                .WithName(name)
-                .Get();
+                .WithName(options.Name)
+                .WithObject(o);
+
+            if (options.AnalyzeProperties)
+            {
+                builder.WithProperties(propertyAnalyzer.AnalyzeProperties(type, o, options.ExtractPropertyValues));
+            }
+
+            return builder.Get();
         }
     }
 }

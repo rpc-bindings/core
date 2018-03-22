@@ -5,6 +5,7 @@ using DSerfozo.RpcBindings.Tests.Fixtures;
 using Moq;
 using System;
 using System.Collections.Generic;
+using DSerfozo.RpcBindings.Contract.Analyze;
 using Xunit;
 
 namespace DSerfozo.RpcBindings.Tests.Analyze
@@ -19,7 +20,10 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
             var idGeneratorMock = new Mock<IIdGenerator>();
             idGeneratorMock.Setup(_ => _.GetNextId()).Returns(Id);
             var objectAnalyzer = new ObjectAnalyzer(idGeneratorMock.Object, Mock.Of<IPropertyAnalyzer>(), Mock.Of<IMethodAnalyzer>());
-            var descriptor = objectAnalyzer.AnalyzeObject("name", new SimpleClass());
+            var descriptor = objectAnalyzer.AnalyzeObject(new SimpleClass(), new AnalyzeOptions()
+            {
+                Name = "name"
+            });
 
             Assert.True(descriptor.Id == Id);
         }
@@ -33,7 +37,10 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
             var idGeneratorMock = new Mock<IIdGenerator>();
             idGeneratorMock.Setup(_ => _.GetNextId()).Returns(Id);
             var objectAnalyzer = new ObjectAnalyzer(idGeneratorMock.Object, Mock.Of<IPropertyAnalyzer>(), Mock.Of<IMethodAnalyzer>());
-            var descriptor = objectAnalyzer.AnalyzeObject(Name, new SimpleClass());
+            var descriptor = objectAnalyzer.AnalyzeObject(new SimpleClass(), new AnalyzeOptions()
+            {
+                Name = Name
+            });
 
             Assert.True(descriptor.Name == Name);
         }
@@ -48,7 +55,10 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
             idGeneratorMock.Setup(_ => _.GetNextId()).Returns(Id);
             var objectAnalyzer = new ObjectAnalyzer(idGeneratorMock.Object, Mock.Of<IPropertyAnalyzer>(), Mock.Of<IMethodAnalyzer>());
             var o = new SimpleClass();
-            var descriptor = objectAnalyzer.AnalyzeObject(Name, o);
+            var descriptor = objectAnalyzer.AnalyzeObject(o, new AnalyzeOptions()
+            {
+                Name = Name
+            });
 
             Assert.Same(o, descriptor.Object);
         }
@@ -70,7 +80,10 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
             methodAnalyzerMock.Setup(_ => _.AnalyzeMethods(It.IsAny<Type>())).Returns(value);
 
             var objectAnalyzer = new ObjectAnalyzer(idGeneratorMock.Object, Mock.Of<IPropertyAnalyzer>(), methodAnalyzer);
-            var descriptor = objectAnalyzer.AnalyzeObject(Name, new SimpleClass());
+            var descriptor = objectAnalyzer.AnalyzeObject(new SimpleClass(), new AnalyzeOptions()
+            {
+                Name = Name
+            });
 
             Assert.Collection(descriptor.Methods, m => Assert.True(m.Key == 1 && m.Value.Id == 1));
         }
@@ -89,10 +102,16 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
             {
                 PropertyDescriptor.Create().WithId(1).Get()
             };
-            propertyAnalyzerMock.Setup(_ => _.AnalyzeProperties(It.IsAny<Type>())).Returns(value);
+            propertyAnalyzerMock.Setup(_ => _.AnalyzeProperties(typeof(SimpleClassWithPrimitiveProperties),
+                It.IsAny<SimpleClassWithPrimitiveProperties>(), true)).Returns(value);
 
             var objectAnalyzer = new ObjectAnalyzer(idGeneratorMock.Object, propertyAnalyzer, Mock.Of<IMethodAnalyzer>());
-            var descriptor = objectAnalyzer.AnalyzeObject(Name, new SimpleClassWithPrimitiveProperties("str"));
+            var descriptor = objectAnalyzer.AnalyzeObject(new SimpleClassWithPrimitiveProperties("str"), new AnalyzeOptions()
+            {
+                Name = "name",
+                AnalyzeProperties = true,
+                ExtractPropertyValues = true
+            });
 
             Assert.Collection(descriptor.Properties, m => Assert.True(m.Key == 1 && m.Value.Id == 1));
         }

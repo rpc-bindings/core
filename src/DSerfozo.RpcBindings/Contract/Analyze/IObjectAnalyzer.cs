@@ -1,11 +1,10 @@
-﻿using DSerfozo.RpcBindings.Model;
+﻿using DSerfozo.RpcBindings.Contract.Analyze;
+using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings.Contract
 {
     public interface IObjectAnalyzer
     {
-        ObjectDescriptor AnalyzeObject<TObject>(string name, TObject o);
-
-        ObjectDescriptor AnalyzeObject(string name, object o);
+        ObjectDescriptor AnalyzeObject(object o, AnalyzeOptions options);
     }
 }

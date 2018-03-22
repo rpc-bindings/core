@@ -5,6 +5,7 @@ using DSerfozo.RpcBindings.Model;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using DSerfozo.RpcBindings.Contract.Analyze;
 
 namespace DSerfozo.RpcBindings
 {
@@ -28,7 +29,7 @@ namespace DSerfozo.RpcBindings
         {
             ThrowIfDisposed();
 
-            var objectDescriptor = objectAnalyzer.AnalyzeObject(key, obj);
+            var objectDescriptor = objectAnalyzer.AnalyzeObject(obj, new AnalyzeOptions{Name = key, AnalyzeProperties = true});
             objects.Add(objectDescriptor.Id, objectDescriptor);
 
             return objectDescriptor;
@@ -38,7 +39,7 @@ namespace DSerfozo.RpcBindings
         {
             ThrowIfDisposed();
 
-            var objectDescriptor = objectAnalyzer.AnalyzeObject(key, obj);
+            var objectDescriptor = objectAnalyzer.AnalyzeObject(obj, new AnalyzeOptions { Name = key, AnalyzeProperties = true });
             objects.Add(objectDescriptor.Id, objectDescriptor);
 
             return objectDescriptor;
@@ -48,7 +49,7 @@ namespace DSerfozo.RpcBindings
         {
             ThrowIfDisposed();
 
-            var objectDescriptor = objectAnalyzer.AnalyzeObject(key, obj);
+            var objectDescriptor = objectAnalyzer.AnalyzeObject(obj, new AnalyzeOptions { Name = key, AnalyzeProperties = true });
             disposables.Add(obj);
             objects.Add(objectDescriptor.Id, objectDescriptor);
 

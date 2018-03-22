@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using DSerfozo.RpcBindings.Contract;
 
 namespace DSerfozo.RpcBindings.Model
@@ -49,6 +50,12 @@ namespace DSerfozo.RpcBindings.Model
                 return this;
             }
 
+            public Builder WithValue(object value)
+            {
+                constructed.Value = value;
+                return this;
+            }
+
             public PropertyDescriptor Get()
             {
                 return constructed;
@@ -66,6 +73,9 @@ namespace DSerfozo.RpcBindings.Model
 
         [ShouldSerialize]
         public bool Writable { get; private set; }
+
+        [ShouldSerialize]
+        public object Value { get; private set; }
 
         public Func<object, object> Getter { get; private set; }
 
