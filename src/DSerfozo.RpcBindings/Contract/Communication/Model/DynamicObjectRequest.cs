@@ -1,11 +1,14 @@
-﻿namespace DSerfozo.RpcBindings.Contract.Communication.Model
+﻿using System.Runtime.Serialization;
+
+namespace DSerfozo.RpcBindings.Contract.Communication.Model
 {
+    [DataContract]
     public class DynamicObjectRequest
     {
-        [ShouldSerialize]
+        [DataMember]
         public long ExecutionId { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public string Name { get; set; }
     }
 }

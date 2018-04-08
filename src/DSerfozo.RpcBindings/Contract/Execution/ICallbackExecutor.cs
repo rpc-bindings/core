@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DSerfozo.RpcBindings.Contract.Model;
+using DSerfozo.RpcBindings.Contract.Execution.Model;
 using DSerfozo.RpcBindings.Execution.Model;
 
-namespace DSerfozo.RpcBindings.Contract
+namespace DSerfozo.RpcBindings.Contract.Execution
 {
     public interface ICallbackExecutor<TMarshal>: IObservable<CallbackExecution<TMarshal>>, IObservable<DeleteCallback>
     {

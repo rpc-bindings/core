@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Remove="Analyze\TypeFilter.cs" />
     <Compile Remove="Contract\Analyze\ITypeFilter.cs" />
+    <Compile Remove="Contract\ShouldSerializeAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>

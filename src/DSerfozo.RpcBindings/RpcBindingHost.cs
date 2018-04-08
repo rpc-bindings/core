@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Analyze;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Communication;
 using DSerfozo.RpcBindings.Contract.Communication.Model;
+using DSerfozo.RpcBindings.Contract.Execution;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Execution;
 using DSerfozo.RpcBindings.Execution.Model;
 using DSerfozo.RpcBindings.Extensions;
@@ -23,7 +24,6 @@ namespace DSerfozo.RpcBindings
         private readonly IPropertyExecutor<TMarshal> propertyExecutor;
         private readonly IBindingRepository bindingRepository;
         private readonly CallbackExecutor<TMarshal> callbackExecutor;
-        private readonly BindingDelegate<TMarshal> binder;
         private bool disposed;
 
         public event EventHandler<ResolvingBoundObjectArgs> ResolvingBoundObject;
@@ -33,8 +33,6 @@ namespace DSerfozo.RpcBindings
         public IBindingRepository Repository => bindingRepository;
 
         public ICallbackExecutor<TMarshal> CallbackExecutor => callbackExecutor;
-
-        //public IPlatformBinder<TMarshal> ParameterBinder => parameterBinder;
 
         protected RpcBindingHost(IConnection<TMarshal> connection, IPlatformBinder<TMarshal> parameterBinder, IScheduler baseScheduler)
         {
@@ -53,7 +51,8 @@ namespace DSerfozo.RpcBindings
                 baseMessages.Select(m => m.CallbackResult)
                     .Where(m => m != null));
             var callbackFactory = new CallbackFactory<TMarshal>(callbackExecutor);
-            binder = new ObjectBinderBuilder<TMarshal>().Use(typeof(CallbackBinder<TMarshal>), callbackFactory)
+            var binder = new ObjectBinderBuilder<TMarshal>().Use(typeof(CallbackBinder<TMarshal>), callbackFactory)
+                .Use(typeof(OutgoingValueBinder<TMarshal>), bindingRepository)
                 .Use(typeof(PlatformBinder<TMarshal>), parameterBinder).Build();
             methodExecutor = new MethodExecutor<TMarshal>(bindingRepository.Objects, binder);
             propertyExecutor = new PropertyExecutor<TMarshal>(bindingRepository.Objects, binder);

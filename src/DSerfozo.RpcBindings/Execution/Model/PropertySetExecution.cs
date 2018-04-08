@@ -1,19 +1,20 @@
-﻿using DSerfozo.RpcBindings.Contract;
+﻿using System.Runtime.Serialization;
 
 namespace DSerfozo.RpcBindings.Execution.Model
 {
+    [DataContract]
     public class PropertySetExecution<TMarshal>
     {
-        [ShouldSerialize]
+        [DataMember]
         public int ExecutionId { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public int PropertyId { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public int ObjectId { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public TMarshal Value { get; set; }
     }
 }

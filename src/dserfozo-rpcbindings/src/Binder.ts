@@ -9,7 +9,7 @@ import {
     DynamicObjectRequest,
     DynamicObjectResponse,
     MethodResult,
-    PropertyGetSetResult
+    PropertyGetSetResult,
 } from './RpcRequest';
 import { SavedCall } from './SavedCall';
 import { buildMapIntKeyRecursive } from './Utils';
@@ -28,7 +28,7 @@ export class Binder {
         connection.on(BindingConnection.PROPERTY_RESULT, this.onPropertyResult.bind(this));
         connection.on(BindingConnection.DYNAMIC_OBJECT_RESULT, this.onDynamicObjectResponse.bind(this));
 
-        objectDescriptors.forEach((function (elem: ObjectDescriptor) {
+        objectDescriptors.forEach(((elem: ObjectDescriptor) => {
             this.boundObjects.set(elem.id,
                 new ObjectBinder(elem,
                     connection,
@@ -91,7 +91,20 @@ export class Binder {
 
         if (callback) {
             try {
-                const callResult = callback.apply(null, execution.parameters);
+                const params = execution.parameters.map((p) => {
+                    let result = p;
+                    if (p && p.type === '5F6FA749-5CD1-4A51-9F69-0B9657C55ECC') {
+                        const descriptor = result as ObjectDescriptor;
+                        result = new ObjectBinder(descriptor,
+                            this.connection,
+                            this.callRegistry,
+                            this.propertyExecutionRegistry,
+                            this.callbackRegistry).bindToNew();
+                    }
+
+                    return result;
+                });
+                const callResult = callback.apply(null, params);
                 if (callResult && typeof callResult.then === 'function') {
                     callResult.then((res) => {
                         connection.sendCallbackResult(
@@ -109,10 +122,18 @@ export class Binder {
                             } as CallbackResult);
                     });
                 } else {
-                    connection.sendCallbackResult(<any>{ success: true, executionId: execution.executionId, result: callResult });
+                    connection.sendCallbackResult({
+                        executionId: execution.executionId,
+                        result: callResult,
+                        success: true,
+                    } as any);
                 }
             } catch (e) {
-                connection.sendCallbackResult(<any>{ success: false, executionId: execution.executionId, exception: e.toString() });
+                connection.sendCallbackResult({
+                    exception: e.toString() ,
+                    executionId: execution.executionId,
+                    success: false,
+                } as any);
             }
         }
     }
@@ -123,7 +144,17 @@ export class Binder {
             this.callRegistry.delete(result.executionId);
 
             if (result.success) {
-                execution.resolve(result.result);
+                let resultVal = result.result;
+                if (resultVal && resultVal.type === '5F6FA749-5CD1-4A51-9F69-0B9657C55ECC') {
+                    const descriptor = resultVal as ObjectDescriptor;
+                    resultVal = new ObjectBinder(descriptor,
+                        this.connection,
+                        this.callRegistry,
+                        this.propertyExecutionRegistry,
+                        this.callbackRegistry).bindToNew();
+                }
+
+                execution.resolve(resultVal);
             } else {
                 execution.reject(result.error);
             }

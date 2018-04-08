@@ -1,7 +1,7 @@
 ﻿using System;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Contract.Marshaling.Model;
-using DSerfozo.RpcBindings.Contract.Model;
 using DSerfozo.RpcBindings.Marshaling;
 using Moq;
 using Xunit;
@@ -86,6 +86,31 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
             binder.Bind(ctx);
 
             Assert.Equal("str", ctx.ObjectValue);
+        }
+
+        [Fact]
+        public void FailedCreationSetsNull()
+        {
+            BindingDelegate<object> bindingDelegate = context =>
+            {
+
+            };
+            var callbackFactoryMock = new Mock<ICallbackFactory<object>>();
+            callbackFactoryMock.Setup(_ => _.CreateCallback(1, typeof(Action), bindingDelegate))
+                .Throws(new InvalidOperationException());
+            var binder = new CallbackBinder<object>(context => {
+                context.ObjectValue = new CallbackDescriptor
+                {
+                    FunctionId = 1
+                };
+            }, callbackFactoryMock.Object);
+
+            var ctx = new BindingContext<object>(ObjectBindingDirection.In, bindingDelegate);
+            ctx.TargetType = typeof(Action);
+
+            binder.Bind(ctx);
+
+            Assert.Null(ctx.ObjectValue);
         }
     }
 }

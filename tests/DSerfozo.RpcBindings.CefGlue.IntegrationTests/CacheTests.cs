@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.CefGlue.Common;
 using DSerfozo.RpcBindings.CefGlue.IntegrationTests.Util;
+using DSerfozo.RpcBindings.Extensions;
 using Xunit;
 
 namespace DSerfozo.RpcBindings.CefGlue.IntegrationTests

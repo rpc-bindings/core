@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Execution;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Execution.Model;
 using DSerfozo.RpcBindings.Extensions;
 using DSerfozo.RpcBindings.Model;
@@ -86,7 +88,7 @@ namespace DSerfozo.RpcBindings.Execution
                     actualResult = executeResult;
                 }
 
-                result.Result = this.BindToWire(actualResult);
+                result.Result = this.BindToWire(actualResult, methodDescriptor.ReturnValueAttribute);
 
                 result.Success = true;
             }

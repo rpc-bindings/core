@@ -118,4 +118,18 @@ describe('PropertyBinder', () => {
 
         expect(timeBeforeSetFinish).toBeLessThanOrEqual(timeOfGet);
     });
+
+    it('Should set values instead of binding if present', async () => {
+        const binder = new PropertyBinder(1, {
+            id: 3,
+            isValueSet: true,
+            name: 'testProp',
+            readable: true,
+            value: {prop: 1},
+        } as any, {save(sc) {sc.resolve(); }} as any, {save() {}} as any, {} as any);
+        const obj = {};
+        binder.bind(obj);
+
+        expect(obj.testProp).toEqual({prop: 1});
+    });
 });

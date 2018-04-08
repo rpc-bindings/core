@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Execution;
 using DSerfozo.RpcBindings.Execution.Model;
 using DSerfozo.RpcBindings.Marshaling;

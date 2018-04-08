@@ -1,5 +1,7 @@
 ﻿using System;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Analyze;
+using DSerfozo.RpcBindings.Extensions;
 using Moq;
 using Xunit;
 

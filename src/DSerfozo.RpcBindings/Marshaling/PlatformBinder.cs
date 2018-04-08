@@ -1,4 +1,5 @@
 ﻿using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Contract.Marshaling.Model;
 
 namespace DSerfozo.RpcBindings.Marshaling
@@ -22,7 +23,7 @@ namespace DSerfozo.RpcBindings.Marshaling
                     Value = ctx.NativeValue
                 });
             }
-            else
+            else if(ctx.ObjectValue != null)
             {
                 ctx.NativeValue = marshal.BindToWire(ctx.ObjectValue);
             }

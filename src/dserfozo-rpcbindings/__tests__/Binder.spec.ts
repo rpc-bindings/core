@@ -202,6 +202,78 @@ describe('Binder', () => {
         expect(typeof result.test).toBe('function');
     });
 
+    it('Should bind method result', async () => {
+        const connection = (new EventEmitter()) as any;
+        let msg;
+        connection.sendMethodExecution = (message) => {
+            msg = message;
+        };
+        const binder = new Binder(connection as any,
+            new Map<number, any>([[1, { id: 1, name: 'test', methods: [{ id: 3, name: 'testFunc' }] }]]));
+        const obj = {};
+
+        binder.bind(obj);
+
+        const promise = obj.test.testFunc();
+
+        connection.emit(BindingConnection.METHOD_RESULT,
+            {
+                executionId: msg.executionId,
+                result: {
+                    id: 1,
+                    methods: new Map<number, MethodDescriptor>([[1, { id: 1, name: 'test' }]]),
+                    type: '5F6FA749-5CD1-4A51-9F69-0B9657C55ECC',
+                },
+                success: true,
+            });
+
+        const result = await promise;
+
+        expect(typeof result.test).toBe('function');
+    });
+
+    it('Should bind callback parameter.', async () => {
+        const connection = (new EventEmitter()) as any;
+        let msg;
+        connection.sendMethodExecution = (message) => {
+            msg = message;
+        };
+        // tslint:disable-next-line:no-empty
+        connection.sendCallbackResult = () => { };
+        const binder = new Binder(connection as any,
+            new Map<number, any>([[1, { id: 1, name: 'test', methods: [{ id: 3, name: 'testFunc' }] }]]));
+        const obj = {};
+
+        binder.bind(obj);
+
+        const callback = jest.fn().mockReturnValue(1);
+        const promise = obj.test.testFunc(callback);
+
+        connection.emit(BindingConnection.METHOD_RESULT,
+            {
+                executionId: msg.executionId,
+                result: 'test',
+                success: true,
+            });
+
+        await promise;
+
+        connection.emit(BindingConnection.CALLBACK_EXECUTION,
+            {
+                executionId: 2,
+                functionId: msg.parameters[0].functionId,
+                parameters: ['text', {
+                    id: 1,
+                    methods: new Map<number, MethodDescriptor>([[1, { id: 1, name: 'test' }]]),
+                    type: '5F6FA749-5CD1-4A51-9F69-0B9657C55ECC',
+                }] ,
+            });
+
+        expect(callback).toBeCalledWith('text', expect.objectContaining({
+            test: expect.any(Function),
+        }));
+    });
+
     it('Should handle dynamic object request error', async () => {
         const connection = new EventEmitter() as BindingConnection;
         let resolveFunc;

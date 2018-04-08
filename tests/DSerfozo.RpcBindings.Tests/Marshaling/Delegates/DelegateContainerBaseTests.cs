@@ -3,6 +3,8 @@ using DSerfozo.RpcBindings.Marshaling.Delegates;
 using Moq;
 using System;
 using System.Runtime.CompilerServices;
+using DSerfozo.RpcBindings.Contract.Execution;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using Xunit;
 
 namespace DSerfozo.RpcBindings.Tests.Marshaling.Delegates
@@ -12,7 +14,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling.Delegates
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void Sun(ICallbackExecutor<object> callbackExecutor)
         {
-            new DelegateContainerBase<object>(1, callbackExecutor, ctx => { });
+            new DelegateContainerBase<object>(1, callbackExecutor, ctx => { }, typeof(object), typeof(Action));
         }
         
         [Fact]

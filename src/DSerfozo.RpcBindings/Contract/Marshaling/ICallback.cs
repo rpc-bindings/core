@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace DSerfozo.RpcBindings.Contract
+namespace DSerfozo.RpcBindings.Contract.Marshaling
 {
     public interface ICallback : IDisposable
     {

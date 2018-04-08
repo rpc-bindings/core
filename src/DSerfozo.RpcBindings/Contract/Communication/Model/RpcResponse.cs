@@ -1,22 +1,24 @@
-﻿using DSerfozo.RpcBindings.Execution.Model;
+﻿using System.Runtime.Serialization;
+using DSerfozo.RpcBindings.Execution.Model;
 
 namespace DSerfozo.RpcBindings.Contract.Communication.Model
 {
+    [DataContract]
     public class RpcResponse<TMarshal>
     {
-        [ShouldSerialize]
+        [DataMember]
         public MethodExecution<TMarshal> MethodExecution { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public CallbackResult<TMarshal> CallbackResult { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public PropertyGetExecution PropertyGet { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public PropertySetExecution<TMarshal> PropertySet { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public DynamicObjectRequest DynamicObjectRequest { get; set; }
     }
 }

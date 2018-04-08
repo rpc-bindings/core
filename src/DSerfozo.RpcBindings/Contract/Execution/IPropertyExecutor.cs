@@ -1,6 +1,6 @@
 ﻿using DSerfozo.RpcBindings.Execution.Model;
 
-namespace DSerfozo.RpcBindings.Contract
+namespace DSerfozo.RpcBindings.Contract.Execution
 {
     public interface IPropertyExecutor<TMarshal>
     {

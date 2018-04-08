@@ -1,4 +1,5 @@
 ﻿using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 
 namespace DSerfozo.RpcBindings.Marshaling
 {

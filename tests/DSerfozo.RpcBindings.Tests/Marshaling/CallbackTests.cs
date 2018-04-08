@@ -1,14 +1,24 @@
-﻿using DSerfozo.RpcBindings.Contract;
+﻿using System;
+using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Marshaling;
 using Moq;
 using System.Threading.Tasks;
-using DSerfozo.RpcBindings.Contract.Model;
+using DSerfozo.RpcBindings.Contract.Execution;
+using DSerfozo.RpcBindings.Contract.Execution.Model;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using Xunit;
 
 namespace DSerfozo.RpcBindings.Tests.Marshaling
 {
     public class CallbackTests
     {
+        private class TestCallback : CallbackBase<object>
+        {
+            public TestCallback(long id, ICallbackExecutor<object> executor, BindingDelegate<object> parameterBinder, Type resultType) : base(id, executor, parameterBinder, resultType)
+            {
+            }
+        }
+
         [Fact]
         public void CallbackDisposed()
         {
@@ -65,10 +75,10 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
             BindingDelegate<object> parameterBinder = context => { };
             executorMock
                 .Setup(_ => _.Execute(It.Is<CallbackExecutionParameters<object>>(o =>
-                    o.Parameters.Length == 1 && o.Binder == parameterBinder))).Returns(Task.FromResult(new object()));
+                    o.Parameters.Length == 1 && o.Binder == parameterBinder && o.ResultTargetType == typeof(string)))).Returns(Task.FromResult(new object()));
             executorMock.SetupGet(_ => _.CanExecute).Returns(true);
 
-            var callback = new Callback<object>(1, executor, parameterBinder);
+            var callback = new TestCallback(1, executor, parameterBinder, typeof(string));
 
             var result = await callback.ExecuteAsync("str");
 

@@ -18,4 +18,8 @@
   <ProjectReference Include="..\..\src\DSerfozo.RpcBindings.Json\DSerfozo.RpcBindings.Json.csproj" />
 </ItemGroup>
 
+<ItemGroup>
+  <Reference Include="Microsoft.CSharp" />
+</ItemGroup>
+
 </Project>

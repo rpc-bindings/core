@@ -3,6 +3,7 @@ using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Tests.Fixtures;
 using Moq;
 using System.Linq;
+using DSerfozo.RpcBindings.Contract.Analyze;
 using Xunit;
 
 namespace DSerfozo.RpcBindings.Tests.Analyze

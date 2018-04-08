@@ -39,3 +39,43 @@ exports.testProp = async function (callback, input) {
         callback(e.toString(), null);
     }
 }
+
+exports.testMethodResult = async function (callback) {
+    try {
+        const result = await test.testMethod3('str');
+        const actual = await result.getValue();
+
+        callback(null, actual === 'str');
+    } catch (e) {
+        callback(e.toString(), null);
+    }
+}
+
+exports.testCallbackBinding = async function (callback) {
+    try {
+        const cb = async function (obj) {
+            try {
+                const actual = await obj.getValue();
+
+                callback(null, actual === 'str');
+            } catch (e) {
+                callback('Error', null);
+            }
+        }
+
+        await test.testMethod4(cb, 'str');
+    } catch (e) {
+        callback('Error', null);
+    }
+}
+
+exports.testPropertyValueSet = async function (callback) {
+    try {
+        const result = await test.testMethod5('str');
+        const actual = result.value;
+
+        callback(null, actual === 'str');
+    } catch (e) {
+        callback(e.toString(), null);
+    }
+}

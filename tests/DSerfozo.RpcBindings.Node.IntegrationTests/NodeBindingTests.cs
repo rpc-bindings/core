@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
+using DSerfozo.RpcBindings.Extensions;
 using DSerfozo.RpcBindings.Json;
 using Microsoft.AspNetCore.NodeServices;
 using Microsoft.AspNetCore.NodeServices.Sockets;
@@ -22,6 +25,25 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
         private readonly LineDelimitedJsonConnection connection;
         private readonly JsonRpcBindingHost rpcHost;
         private readonly Task initTask;
+
+        public class TestBound2
+        {
+            private readonly string str;
+
+            public string Value => str;
+
+            public TestBound2(string str)
+            {
+                this.str = str;
+            }
+
+            public string GetValue()
+            {
+                return str;
+            }
+        }
+
+        public delegate Task TestDelegate([BindValue]TestBound2 b);
 
         public class TestBound
         {
@@ -47,6 +69,24 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
                 return val.HasValue ? val.Value + 1 : -1;
             }
 
+            [return:BindValue]
+            public TestBound2 TestMethod3(string str)
+            {
+                return new TestBound2(str);
+            }
+
+            [return: BindValue]
+            public void TestMethod4(TestDelegate del, string str)
+            {
+                del(new TestBound2(str));
+            }
+
+            [return: BindValue(ExtractPropertyValues = true)]
+            public TestBound2 TestMethod5(string str)
+            {
+                return new TestBound2(str);
+            }
+
             public async Task<string> DelegateTest(Func<string, Task<string>> func)
             {
                 return await func("test").ConfigureAwait(false);
@@ -60,8 +100,8 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
                 ApplicationStoppingToken = stopTokenSource.Token,
                 ProjectPath = AppDomain.CurrentDomain.BaseDirectory,
                 NodeInstanceOutputLogger = Mock.Of<ILogger>(),
-                //DebuggingPort = 9000,
-                //LaunchWithDebugging = true
+                DebuggingPort = 9000,
+                LaunchWithDebugging = true
             };
             options.UseSocketHosting();
             nodeServices = NodeServicesFactory.CreateNodeServices(options);
@@ -131,6 +171,36 @@ namespace DSerfozo.RpcBindings.Node.IntegrationTests
             var result = await nodeServices.InvokeExportAsync<string>("binding-test", "delegateTest");
             
             Assert.Equal("test->JS", result);
+        }
+
+        [Fact]
+        public async Task MethodResultBound()
+        {
+            await initTask;
+
+            var result = await nodeServices.InvokeExportAsync<bool>("binding-test", "testMethodResult");
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task CallbackParameterBound()
+        {
+            await initTask;
+
+            var result = await nodeServices.InvokeExportAsync<bool>("binding-test", "testCallbackBinding");
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task PropertyValueSet()
+        {
+            await initTask;
+
+            var result = await nodeServices.InvokeExportAsync<bool>("binding-test", "testPropertyValueSet");
+
+            Assert.True(result);
         }
 
         public void Dispose()

@@ -28,14 +28,14 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer
         public BrowserController(CefBrowser browser, PromiseService promiseService)
         {
             this.browser = browser;
-            v8Serializer = new V8Serializer(promiseService, callbackRegistry);
             functionCallPromiseRegistry = new SavedValueFactory<Promise>(promiseService.CreatePromise);
             dynamicObjectPromiseRegistry = new SavedValueFactory<Promise>(promiseService.CreatePromise);
+            v8Serializer = new V8Serializer(promiseService, callbackRegistry, functionCallPromiseRegistry);
         }
 
         public bool OnProcessMessage(CefProcessMessage message)
         {
-            var response = RpcMessageSerializer.CreateRpcRequest(message);
+            var response = RpcMessageSerializer.CreateRpcRequest(message, v8Serializer);
             var handled = false;
             if (response?.CallbackExecution != null)
             {

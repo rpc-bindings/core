@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;

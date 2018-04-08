@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.CefGlue.IntegrationTests.Util;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
+using DSerfozo.RpcBindings.Extensions;
 using DSerfozo.RpcBindings.Marshaling;
 using Xilium.CefGlue;
 using Xunit;

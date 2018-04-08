@@ -1,5 +1,6 @@
 ﻿using DSerfozo.RpcBindings.Contract;
 using System.Threading;
+using DSerfozo.RpcBindings.Contract.Analyze;
 
 namespace DSerfozo.RpcBindings.Analyze
 {

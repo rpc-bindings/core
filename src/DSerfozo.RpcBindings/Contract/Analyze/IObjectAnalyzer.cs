@@ -1,7 +1,6 @@
-﻿using DSerfozo.RpcBindings.Contract.Analyze;
-using DSerfozo.RpcBindings.Model;
+﻿using DSerfozo.RpcBindings.Model;
 
-namespace DSerfozo.RpcBindings.Contract
+namespace DSerfozo.RpcBindings.Contract.Analyze
 {
     public interface IObjectAnalyzer
     {

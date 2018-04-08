@@ -1,4 +1,5 @@
 ﻿using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Analyze;
 
 namespace DSerfozo.RpcBindings.Tests.Fixtures
 {

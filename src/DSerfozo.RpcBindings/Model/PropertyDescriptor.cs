@@ -1,10 +1,10 @@
 ﻿using System;
-using System.ComponentModel;
-using DSerfozo.RpcBindings.Contract;
+using System.Runtime.Serialization;
 
 namespace DSerfozo.RpcBindings.Model
 {
-    public sealed class PropertyDescriptor
+    [DataContract]
+    public class PropertyDescriptor
     {
         public sealed class Builder
         {
@@ -53,6 +53,7 @@ namespace DSerfozo.RpcBindings.Model
             public Builder WithValue(object value)
             {
                 constructed.Value = value;
+                constructed.IsValueSet = true;
                 return this;
             }
 
@@ -62,20 +63,23 @@ namespace DSerfozo.RpcBindings.Model
             }
         }
 
-        [ShouldSerialize]
-        public long Id { get; private set;  }
+        [DataMember]
+        public long Id { get; protected set;  }
 
-        [ShouldSerialize]
-        public string Name { get; private set; }
+        [DataMember]
+        public string Name { get; protected set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public bool Readable { get; private set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public bool Writable { get; private set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public object Value { get; private set; }
+
+        [DataMember]
+        public bool IsValueSet { get; private set; }
 
         public Func<object, object> Getter { get; private set; }
 
@@ -83,7 +87,7 @@ namespace DSerfozo.RpcBindings.Model
 
         public Type Type { get; private set; }
 
-        private PropertyDescriptor()
+        protected PropertyDescriptor()
         {
             
         }

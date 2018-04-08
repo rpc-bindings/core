@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
+using DSerfozo.RpcBindings.CefGlue.Renderer.Binding;
 using DSerfozo.RpcBindings.CefGlue.Renderer.Services;
 using DSerfozo.RpcBindings.CefGlue.Renderer.Util;
+using DSerfozo.RpcBindings.Contract.Marshaling.Model;
+using DSerfozo.RpcBindings.Model;
 using Xilium.CefGlue;
 
 namespace DSerfozo.RpcBindings.CefGlue.Renderer.Serialization
@@ -12,11 +16,14 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Serialization
     {
         private readonly PromiseService promiseService;
         private readonly SavedValueRegistry<Callback> callbackRegistry;
+        private readonly SavedValueFactory<Promise> functionCallPromiseRegistry;
 
-        public V8Serializer(PromiseService promiseService, SavedValueRegistry<Callback> callbackRegistry)
+        public V8Serializer(PromiseService promiseService, SavedValueRegistry<Callback> callbackRegistry,
+            SavedValueFactory<Promise> functionCallPromiseRegistry)
         {
             this.promiseService = promiseService;
             this.callbackRegistry = callbackRegistry;
+            this.functionCallPromiseRegistry = functionCallPromiseRegistry;
         }
 
         public CefValue Serialize(CefV8Value value)
@@ -25,11 +32,6 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Serialization
             var result = Serialize(value, callbackRegistry, promiseService, list);
             list.Where(f => !f.IsFunction).ToList().ForEach(f => f.Dispose());
             return result;
-        }
-
-        public CefV8Value Deserialize(CefValue value)
-        {
-            return Deserialize(value, false);
         }
 
         public CefValue Serialize(CefV8Value value, SavedValueRegistry<Callback> callbackRegistry, PromiseService promiseService, List<CefV8Value> seen)
@@ -77,43 +79,47 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Serialization
             }
             else if (value.IsArray)
             {
-                /*using (*/
-                var list = CefListValue.Create() /*)*/;
+                using (var list = CefListValue.Create())
                 {
-                    list.SetSize(value.GetArrayLength() + 1);
-                    list.SetInt(0, (int) CefTypes.Array);
+                    list.SetSize(value.GetArrayLength());
                     for (var i = 0; i < value.GetArrayLength(); i++)
                     {
-                        list.SetValue(i + 1, Serialize(value.GetValue(i), callbackRegistry, promiseService, seen));
+                        list.SetValue(i, Serialize(value.GetValue(i), callbackRegistry, promiseService, seen));
                     }
                     result.SetList(list);
                 }
             }
             else if (value.IsFunction)
             {
-                using (var list = CefListValue.Create())
+                var callback = new Callback(value, promiseService, this);
+                var id = callbackRegistry.Save(frameId, callback);
+
+                using (var list = CefDictionaryValue.Create())
+                    using(var actualValue = CefDictionaryValue.Create() )
                 {
-                    var callback = new Callback(value, promiseService, this);
-                    var id = callbackRegistry.Save(frameId, callback);
+                    list.SetString(ObjectSerializer.TypeIdPropertyName, CallbackDescriptor.TypeId);
 
-                    list.SetInt(0, (int)CefTypes.Callback);
-                    list.SetInt64(1, id);
+                    actualValue.SetInt64(nameof(CallbackDescriptor.FunctionId), id);
 
-                    result.SetList(list);
+                    list.SetDictionary(ObjectSerializer.ValuePropertyName, actualValue);
+                    result.SetDictionary(list);
                 }
             }
             else if (value.IsObject)
             {
                 using (var dict = CefDictionaryValue.Create())
+                using(var actualValue = CefDictionaryValue.Create())
                 {
+                    dict.SetString(ObjectSerializer.TypeIdPropertyName, ObjectSerializer.DictionaryTypeId);
                     if (value.TryGetKeys(out var keys))
                     {
                         foreach (var key in keys)
                         {
-                            dict.SetValue(key, Serialize(value.GetValue(key), callbackRegistry, promiseService, seen));
+                            actualValue.SetValue(key, Serialize(value.GetValue(key), callbackRegistry, promiseService, seen));
                         }
                     }
 
+                    dict.SetDictionary(ObjectSerializer.ValuePropertyName, actualValue);
                     result.SetDictionary(dict);
                 }
             }
@@ -121,7 +127,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Serialization
             return result;
         }
 
-        public static CefV8Value Deserialize(CefValue value, bool t = false)
+        public CefV8Value Deserialize(CefValue value)
         {
             var valueType = value.GetValueType();
 
@@ -155,17 +161,16 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Serialization
                 {
                     if (list.Count > 0)
                     {
-                        var type = (CefTypes)list.GetInt(0);
-                        if (type == CefTypes.Array)
+                        var array = CefV8Value.CreateArray(list.Count);
+                        for (var i = 0; i < list.Count; i++)
                         {
-                            var array = CefV8Value.CreateArray(list.Count - 1);
-                            for (var i = 0; i < list.Count - 1; i++)
+                            using (var cefValue = list.GetValue(i))
                             {
-                                array.SetValue(i, Deserialize(list.GetValue(i + 1), t));
+                                array.SetValue(i, Deserialize(cefValue));
                             }
-
-                            return array;
                         }
+
+                        return array;
                     }
                 }
             }
@@ -173,12 +178,25 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Serialization
             {
                 using (var dict = value.GetDictionary())
                 {
-                    var obj = CefV8Value.CreateObject();
-                    foreach (var key in dict.GetKeys())
+                    var typeId = dict.GetString(ObjectSerializer.TypeIdPropertyName);
+                    using (var actualValue = dict.GetDictionary(ObjectSerializer.ValuePropertyName))
                     {
-                        obj.SetValue(key, Deserialize(dict.GetValue(key), t));
+                        if (typeId == ObjectSerializer.DictionaryTypeId)
+                        {
+                            var obj = CefV8Value.CreateObject();
+                            foreach (var key in actualValue.GetKeys())
+                            {
+                                obj.SetValue(key, Deserialize(actualValue.GetValue(key)));
+                            }
+                            return obj;
+                        }
+
+                        if (typeId == ObjectDescriptor.TypeId)
+                        {
+                            var descriptor = ObjectDescriptorSerializer.ReadObjectDescriptor(actualValue, this);
+                            return new ObjectBinder(descriptor, this, functionCallPromiseRegistry).BindToNew();
+                        }
                     }
-                    return obj;
                 }
             }
             

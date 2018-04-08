@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DSerfozo.RpcBindings.CefGlue.Renderer.Serialization;
 using DSerfozo.RpcBindings.Contract.Communication.Model;
 using DSerfozo.RpcBindings.Execution.Model;
 using Xilium.CefGlue;
@@ -96,10 +97,10 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
 
                 if (dynamicObjectResponse.Success)
                 {
-                    using (var descriptor = CefListValue.Create())
+                    using (var descriptor = CefDictionaryValue.Create())
                     {
                         dynamicObjectResponse.ObjectDescriptor.ToCefList(descriptor);
-                        arguments.SetList(3, descriptor);
+                        arguments.SetDictionary(3, descriptor);
                     }
                 }
             }
@@ -129,7 +130,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
             return message;
         }
 
-        public static RpcRequest<CefValue> CreateRpcRequest(CefProcessMessage mesage)
+        public static RpcRequest<CefValue> CreateRpcRequest(CefProcessMessage mesage, V8Serializer v8Serializer)
         {
             RpcRequest<CefValue> result = null;
 
@@ -145,10 +146,10 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
 
                     if (dynamicResult.Success)
                     {
-                        using (var descriptor = args.GetList(3))
+                        using (var descriptor = args.GetDictionary(3))
                         {
                             dynamicResult.ObjectDescriptor =
-                                ObjectDescriptorSerializer.ReadObjectDescriptor(descriptor);
+                                ObjectDescriptorSerializer.ReadObjectDescriptor(descriptor, v8Serializer);
                         }
                     }
                     else
@@ -162,7 +163,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
                     };
                     break;
                 case Messages.MethodResultMessageName:
-                    var methodResult = new MethodResult<CefValue>()
+                    var methodResult = new MethodResult<CefValue>
                     {
                         ExecutionId = args.GetInt64(0),
                         Success = args.GetBool(1),
@@ -170,7 +171,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
                         Result = args.GetValue(3)
                     };
 
-                    result = new RpcRequest<CefValue>()
+                    result = new RpcRequest<CefValue>
                     {
                         MethodResult = methodResult
                     };

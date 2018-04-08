@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Contract.Marshaling.Model;
 using DSerfozo.RpcBindings.Marshaling;
 using Xunit;

@@ -8,6 +8,8 @@ export interface PropertyDescriptor {
     name: string;
     writable: boolean;
     readable: boolean;
+    isValueSet: boolean;
+    value: any;
 }
 
 export interface ObjectDescriptor {

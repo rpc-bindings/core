@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using Xilium.CefGlue;
 
 namespace DSerfozo.RpcBindings.CefGlue.Browser

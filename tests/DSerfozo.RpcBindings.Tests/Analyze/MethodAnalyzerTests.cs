@@ -3,6 +3,7 @@ using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Tests.Fixtures;
 using Moq;
 using System.Linq;
+using DSerfozo.RpcBindings.Contract.Analyze;
 using Xunit;
 
 namespace DSerfozo.RpcBindings.Tests.Analyze
@@ -76,6 +77,18 @@ namespace DSerfozo.RpcBindings.Tests.Analyze
             var actual = methodAnalyzer.AnalyzeMethods(typeof(SimpleClassIgnore)).ToList();
 
             Assert.Equal(1, actual.Count);
+        }
+
+        [Fact]
+        public void BindValueAttributeAnalyzed()
+        {
+            MethodAnalyzer methodAnalyzer = new MethodAnalyzer(new IntIdGenerator(), new IdentityNameGenerator());
+            var actual = methodAnalyzer.AnalyzeMethods(typeof(SimpleClassWithMethods)).ToList();
+
+            Assert.Collection(actual.OrderBy(p => p.ParameterCount),
+                f => Assert.True(true),
+                f => Assert.NotNull(f.ReturnValueAttribute),
+                f => Assert.True(true));
         }
 
         [Fact]

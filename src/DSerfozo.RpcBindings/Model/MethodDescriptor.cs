@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 
 namespace DSerfozo.RpcBindings.Model
 {
+    [DataContract]
     public sealed class MethodDescriptor
     {
         public sealed class Builder
@@ -47,6 +50,12 @@ namespace DSerfozo.RpcBindings.Model
                 return this;
             }
 
+            public Builder WithBindValue(BindValueAttribute attr)
+            {
+                constructed.ReturnValueAttribute = attr;
+                return this;
+            }
+
             public MethodDescriptor Get()
             {
                 return constructed;
@@ -58,15 +67,17 @@ namespace DSerfozo.RpcBindings.Model
             }
         }
 
-        [ShouldSerialize]
+        [DataMember]
         public long Id { get; private set;  }
 
-        [ShouldSerialize]
+        [DataMember]
         public string Name { get; private set; }
 
         public Type ResultType { get; private set; }
 
-        [ShouldSerialize]
+        public BindValueAttribute ReturnValueAttribute { get; private set; }
+
+        [DataMember]
         public int ParameterCount { get; private set; }
 
         public IEnumerable<MethodParameterDescriptor> Parameters { get; private set; }

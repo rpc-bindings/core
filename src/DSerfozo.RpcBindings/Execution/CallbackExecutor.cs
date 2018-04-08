@@ -4,7 +4,10 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
-using DSerfozo.RpcBindings.Contract.Model;
+using DSerfozo.RpcBindings.Contract.Analyze;
+using DSerfozo.RpcBindings.Contract.Execution;
+using DSerfozo.RpcBindings.Contract.Execution.Model;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Execution.Model;
 using DSerfozo.RpcBindings.Extensions;
 
@@ -71,7 +74,7 @@ namespace DSerfozo.RpcBindings.Execution
             {
                 ExecutionId = nextId,
                 FunctionId = execute.Id,
-                Parameters = execute.Parameters.Select(execute.BindToWire).ToArray(),
+                Parameters = execute.Parameters.Select(s => execute.BindToWire(s.Value, s.Bindable)).ToArray(),
             });
 
             return pending.Tcs.Task;

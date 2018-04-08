@@ -8,6 +8,8 @@ namespace DSerfozo.RpcBindings.Contract.Marshaling.Model
 
         public BindingDelegate<TMarshal> Binder { get; }
 
+        public BindValueAttribute BindValue { get; set; }
+
         public Type TargetType { get; set; }
 
         public TMarshal NativeValue { get; set; }

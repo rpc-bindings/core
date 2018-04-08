@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using DSerfozo.RpcBindings.Model;
 
-namespace DSerfozo.RpcBindings.Contract
+namespace DSerfozo.RpcBindings.Contract.Analyze
 {
     public interface IPropertyAnalyzer
     {

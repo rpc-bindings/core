@@ -1,12 +1,11 @@
-﻿using DSerfozo.RpcBindings.Marshaling;
-using DSerfozo.RpcBindings.Model;
+﻿using DSerfozo.RpcBindings.Model;
 using DSerfozo.RpcBindings.Tests.Fixtures;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Execution;
 using DSerfozo.RpcBindings.Execution.Model;
 using Xunit;
@@ -140,6 +139,51 @@ namespace DSerfozo.RpcBindings.Tests.Execution
             Assert.Equal(Value, result.Result as string);
             Assert.Equal(ExecutionId, result.ExecutionId);
             Assert.True(result.Success);
+        }
+
+        [Fact]
+        public async Task ReturnValueBindingSetIfNecessary()
+        {
+            const string Value = "expected";
+            var methodExecutor = new MethodExecutor<object>(
+                new ReadOnlyDictionary<long, ObjectDescriptor>(
+                    new Dictionary<long, ObjectDescriptor>
+                    {
+                        {
+                            1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>
+                            {
+                                MethodDescriptor.Create()
+                                    .WithId(2)
+                                    .WithParameterCount(1)
+                                    .WithBindValue(new BindValueAttribute())
+                                    .WithResultType(typeof(string))
+                                    .WithParameters(new List<MethodParameterDescriptor>
+                                    {
+                                        
+                                    })
+                                    .WithExecute((o, a) => Value)
+                                    .Get()
+                            }).WithId(1).Get()
+                        }
+                    }), context =>
+                {
+                    if (context.Direction == ObjectBindingDirection.In)
+                        context.ObjectValue = context.NativeValue;
+                    else if(context.BindValue != null && context.ObjectValue == Value)
+                    {
+                        context.NativeValue = context.ObjectValue;
+                    }
+                });
+
+            var result = await methodExecutor.Execute(new MethodExecution<object>()
+            {
+                ExecutionId = 3,
+                ObjectId = 1,
+                MethodId = 2,
+                Parameters = new object[] { Value }
+            });
+
+            Assert.Equal(Value, result.Result as string);
         }
 
         [Fact]

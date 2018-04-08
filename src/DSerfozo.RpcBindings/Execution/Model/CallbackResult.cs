@@ -1,19 +1,20 @@
-﻿using DSerfozo.RpcBindings.Contract;
+﻿using System.Runtime.Serialization;
 
 namespace DSerfozo.RpcBindings.Execution.Model
 {
+    [DataContract]
     public class CallbackResult<TMarshal>
     {
-        [ShouldSerialize]
+        [DataMember]
         public long ExecutionId { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public string Error { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public TMarshal Result { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public bool Success { get; set; }
     }
 }

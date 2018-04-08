@@ -1,4 +1,5 @@
 ﻿using DSerfozo.RpcBindings.CefGlue.IntegrationTests.Util;
+using DSerfozo.RpcBindings.Extensions;
 using System;
 using System.IO;
 using System.Linq;

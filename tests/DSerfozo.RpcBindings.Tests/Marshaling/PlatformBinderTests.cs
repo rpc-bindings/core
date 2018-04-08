@@ -1,4 +1,5 @@
 ﻿using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Contract.Marshaling.Model;
 using DSerfozo.RpcBindings.Marshaling;
 using Moq;
@@ -42,6 +43,22 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
             binding.Bind(bindingContext);
 
             Assert.Equal("str", bindingContext.NativeValue);
+        }
+
+        [Fact]
+        public void BindToWireNotCalledForNullObject()
+        {
+            var platformBinderMock = new Mock<IPlatformBinder<object>>();
+            platformBinderMock.Setup(_ =>
+                _.BindToWire(It.IsAny<object>())).Returns("str");
+            var binding = new PlatformBinder<object>(context => { }, platformBinderMock.Object);
+
+            var bindingContext = new BindingContext<object>(ObjectBindingDirection.Out, null)
+            {
+            };
+            binding.Bind(bindingContext);
+
+            Assert.Equal(null, bindingContext.NativeValue);
         }
     }
 }

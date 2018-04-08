@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DSerfozo.RpcBindings.Contract
+namespace DSerfozo.RpcBindings.Contract.Marshaling
 {
     public class Binding<T>
     {

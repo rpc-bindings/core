@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Execution;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Execution.Model;
 using DSerfozo.RpcBindings.Extensions;
 using DSerfozo.RpcBindings.Model;
@@ -31,7 +33,7 @@ namespace DSerfozo.RpcBindings.Execution
             try
             {
                 var getResult = propertyDescriptor.Getter(objectDescriptor.Object);
-                result.Value = this.BindToWire(getResult);
+                result.Value = this.BindToWire(getResult, null);
                 result.Success = true;
             }
             catch (Exception e)

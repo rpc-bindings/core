@@ -1,4 +1,4 @@
-﻿namespace DSerfozo.RpcBindings.Contract
+﻿namespace DSerfozo.RpcBindings.Contract.Marshaling
 {
     public interface IPlatformBinder<T>
     {

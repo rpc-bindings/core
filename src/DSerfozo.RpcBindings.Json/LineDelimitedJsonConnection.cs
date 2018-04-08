@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Communication;
 using DSerfozo.RpcBindings.Contract.Communication.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

@@ -1,15 +1,18 @@
-﻿using DSerfozo.RpcBindings.Contract;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
+using DSerfozo.RpcBindings.Castle.DynamicProxy;
+using DSerfozo.RpcBindings.Contract.Execution;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 
 namespace DSerfozo.RpcBindings.Marshaling.Delegates
 {
     public class CallbackDelegateGenerator<TMarshal>
     {
+        private static readonly ProxyGenerator Generator = new ProxyGenerator();
         private const string DelegateMethodName = "DynamicCall";
 
         private readonly IDictionary<Type, Type> typeCache = new Dictionary<Type, Type>();
@@ -24,7 +27,7 @@ namespace DSerfozo.RpcBindings.Marshaling.Delegates
                 typeCache.Add(delegateType, delegateContainerType);
             }
 
-            var created = Activator.CreateInstance(delegateContainerType, new object[] { id, callbackExecutor, parameterBinder });
+            var created = Activator.CreateInstance(delegateContainerType, id, callbackExecutor, parameterBinder, delegateType);
 
             return Delegate.CreateDelegate(delegateType, created, DelegateMethodName, false, true); ;
         }
@@ -32,13 +35,27 @@ namespace DSerfozo.RpcBindings.Marshaling.Delegates
         private static Type GenerateDelegateContainerType(Type delegateType)
         {
             var methodInfo = delegateType.GetMethod(nameof(Action.Invoke));
-            var argumentTypes = methodInfo.GetParameters().Select(s => s.ParameterType).ToArray();
+            var parameterInfos = methodInfo.GetParameters();
+            var argumentTypes = parameterInfos.Select(s => s.ParameterType).ToArray();
             var returnType = methodInfo.ReturnType;
+            var underlyingReturnType = typeof(object);
+            if (returnType.IsGenericType)
+            {
+                underlyingReturnType = returnType.GetGenericArguments().First();
+            }
 
-            var assemblyName = new AssemblyName("AssemblyName");
-            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
-            var typeBuilder = moduleBuilder.DefineType(assemblyName.FullName
+            var moduleScope = Generator.ProxyBuilder.ModuleScope;
+            var moduleBuilder = moduleScope.ObtainDynamicModuleWithStrongName();
+            var targetIntfName =
+                "Castle.Proxies.Delegates." +
+                delegateType.ToString()
+                    .Replace('.', '_')
+                    .Replace(',', '`')
+                    .Replace("+", "__")
+                    .Replace("[", "``")
+                    .Replace("]", "``");
+            var typeName = moduleScope.NamingScope.GetUniqueName(targetIntfName);
+            var typeBuilder = moduleBuilder.DefineType(typeName
                               , TypeAttributes.Public |
                               TypeAttributes.Class |
                               TypeAttributes.AutoClass |
@@ -46,21 +63,26 @@ namespace DSerfozo.RpcBindings.Marshaling.Delegates
                               TypeAttributes.BeforeFieldInit
                               , null);
             typeBuilder.SetParent(typeof(DelegateContainerBase<TMarshal>));
-            var parentConstructor = typeof(DelegateContainerBase<TMarshal>).GetConstructor(new[] { typeof(long), typeof(ICallbackExecutor<TMarshal>), typeof(BindingDelegate<TMarshal>) });
+            var type = typeof(DelegateContainerBase<TMarshal>);
+            var parentConstructor = type.GetConstructor(new[] { typeof(long), typeof(ICallbackExecutor<TMarshal>), typeof(BindingDelegate<TMarshal>), typeof(Type), typeof(Type) });
             var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public |
                 MethodAttributes.HideBySig |
                 MethodAttributes.SpecialName |
                 MethodAttributes.RTSpecialName, CallingConventions.Standard |
-                CallingConventions.HasThis, new[] { typeof(long), typeof(ICallbackExecutor<TMarshal>), typeof(BindingDelegate<TMarshal>) });
+                CallingConventions.HasThis, new[] { typeof(long), typeof(ICallbackExecutor<TMarshal>), typeof(BindingDelegate<TMarshal>), typeof(Type) });
             var constructorGenerator = constructorBuilder.GetILGenerator();
             constructorGenerator.Emit(OpCodes.Ldarg_0);
             constructorGenerator.Emit(OpCodes.Ldarg_1);
             constructorGenerator.Emit(OpCodes.Ldarg_2);
             constructorGenerator.Emit(OpCodes.Ldarg_3);
+            constructorGenerator.Emit(OpCodes.Ldtoken, underlyingReturnType);
+            constructorGenerator.Emit(OpCodes.Call,
+                typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), BindingFlags.Static | BindingFlags.Public));
+            constructorGenerator.Emit(OpCodes.Ldarg_S, 4);
             constructorGenerator.Emit(OpCodes.Call, parentConstructor);
             constructorGenerator.Emit(OpCodes.Ret);
             var parentMethod = typeof(DelegateContainerBase<TMarshal>).GetMethod("ExecuteAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-            var executeMethod = parentMethod.MakeGenericMethod(returnType.GenericTypeArguments.First());
+            var executeMethod = parentMethod.MakeGenericMethod(underlyingReturnType);
             var methodBuilder = typeBuilder.DefineMethod(DelegateMethodName, MethodAttributes.Public |
                 MethodAttributes.HideBySig, returnType, argumentTypes);
             var methodGenerator = methodBuilder.GetILGenerator();
@@ -89,10 +111,9 @@ namespace DSerfozo.RpcBindings.Marshaling.Delegates
         private static void ValidateDelegateType(Type delegateType)
         {
             var methodInfo = delegateType.GetMethod(nameof(Action.Invoke));
-            if(!typeof(Task).IsAssignableFrom(methodInfo.ReturnType) ||
-                !methodInfo.ReturnType.IsGenericType)
+            if(!typeof(Task).IsAssignableFrom(methodInfo.ReturnType))
             {
-                throw new InvalidOperationException("The supplied delegate type must have a Task<T> return value.");
+                throw new InvalidOperationException("The supplied delegate type must have a Task return value.");
             }
         }
     }

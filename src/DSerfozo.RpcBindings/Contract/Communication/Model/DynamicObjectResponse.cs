@@ -1,19 +1,21 @@
-﻿using DSerfozo.RpcBindings.Model;
+﻿using System.Runtime.Serialization;
+using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings.Contract.Communication.Model
 {
+    [DataContract]
     public class DynamicObjectResponse
     {
-        [ShouldSerialize]
+        [DataMember]
         public long ExecutionId { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public bool Success { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public string Exception { get; set; }
 
-        [ShouldSerialize]
+        [DataMember]
         public ObjectDescriptor ObjectDescriptor { get; set; }
     }
 }

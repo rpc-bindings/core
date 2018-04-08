@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using DSerfozo.RpcBindings.Contract.Model;
+using DSerfozo.RpcBindings.Contract.Marshaling.Model;
+using DSerfozo.RpcBindings.Model;
 using Xilium.CefGlue;
 
 namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
 {
     public static class ObjectSerializer
     {
+        public const string TypeIdPropertyName = "TypeId";
+        public const string ValuePropertyName = "Value";
+        public const string DictionaryTypeId = "25CDD082-4A67-48A0-A342-1FAB77BC6450";
+
         public static CefValue Serialize(object obj, HashSet<object> seen, int? index = null, string key = null)
         {
             var result = CefValue.Create();
@@ -91,20 +96,32 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
                 var array = (Array) obj;
                 using (var value = CefListValue.Create())
                 {
-                    value.SetInt(0, (byte) CefTypes.Array);
-
-                    for (var i = 1; i < array.Length + 1; i++)
+                    for (var i = 0; i < array.Length; i++)
                     {
-                        value.SetValue(i, Serialize(array.GetValue(i - 1), seen, i));
+                        value.SetValue(i, Serialize(array.GetValue(i), seen, i));
                     }
 
                     result.SetList(value);
                 }
             }
+            else if (type == typeof(ObjectDescriptor))
+            {
+                using (var value = CefDictionaryValue.Create())
+                using (var descriptor = CefDictionaryValue.Create())
+                {
+                    value.SetString(TypeIdPropertyName, ObjectDescriptor.TypeId);
+                    ((ObjectDescriptor)obj).ToCefList(descriptor);
+                    value.SetDictionary(ValuePropertyName, descriptor);
+
+                    result.SetDictionary(value);
+                }
+            }
             else if (type?.IsPrimitive == false && !type.IsEnum)
             {
                 using (var value = CefDictionaryValue.Create())
+                using (var dict = CefDictionaryValue.Create())
                 {
+                    value.SetString(TypeIdPropertyName, DictionaryTypeId);
                     var properties = type.GetProperties();
 
                     foreach (var property in properties)
@@ -113,9 +130,11 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
                         var dataMember = property.GetCustomAttribute<DataMemberAttribute>();
                         var name = dataMember?.Name ?? property.Name;
 
-                        value.SetValue(name, Serialize(propertyValue, seen));
+                        var cefValue = Serialize(propertyValue, seen);
+                        dict.SetValue(name, cefValue);
                     }
 
+                    value.SetDictionary(ValuePropertyName, dict);
                     result.SetDictionary(value);
                 }
             }
@@ -259,50 +278,58 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
                 case CefValueType.Dictionary:
                     using (var dictVal = value.GetDictionary())
                     {
-                        try
+                        var typeId = dictVal.GetString(TypeIdPropertyName);
+                        using (var actualValue = dictVal.GetDictionary(ValuePropertyName))
                         {
-                            result = Activator.CreateInstance(targetType);
-                            var properties = targetType.GetProperties()
-                                .Select(p => new { Prop = p, DataMember = p.GetCustomAttribute<DataMemberAttribute>() })
-                                .ToDictionary(k => k.DataMember?.Name ?? k.Prop.Name, v => v.Prop);
-                            var keys = dictVal.GetKeys();
-                            foreach (var dictKey in keys)
+                            if (typeId == DictionaryTypeId)
                             {
-                                if (properties.TryGetValue(dictKey, out var matchingProperty))
+                                try
                                 {
-                                    matchingProperty.SetValue(result,
-                                        Deserialize(dictVal.GetValue(dictKey), matchingProperty.PropertyType));
+                                    result = Activator.CreateInstance(targetType);
+                                    var properties = targetType.GetProperties()
+                                        .Select(p =>
+                                            new {Prop = p, DataMember = p.GetCustomAttribute<DataMemberAttribute>()})
+                                        .ToDictionary(k => k.DataMember?.Name ?? k.Prop.Name, v => v.Prop);
+                                    var keys = actualValue.GetKeys();
+                                    foreach (var dictKey in keys)
+                                    {
+                                        if (properties.TryGetValue(dictKey, out var matchingProperty))
+                                        {
+                                            matchingProperty.SetValue(result,
+                                                Deserialize(actualValue.GetValue(dictKey),
+                                                    matchingProperty.PropertyType));
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+
                                 }
                             }
-                        }
-                        catch
-                        {
-                            
+                            else if (typeId == CallbackDescriptor.TypeId)
+                            {
+                                result = new CallbackDescriptor
+                                {
+                                    FunctionId = actualValue.GetInt64(nameof(CallbackDescriptor.FunctionId))
+                                };
+                            }
                         }
                     }
                     break;
                 case CefValueType.List:
                     using (var lstVal = value.GetList())
                     {
-                        var cefType = (CefTypes) lstVal.GetInt(0);
-                        if (targetType.IsArray && cefType == CefTypes.Array)
+                        if (targetType.IsArray)
                         {
                             var elementType = targetType.GetElementType();
-                            var array = Activator.CreateInstance(targetType, new object[]{lstVal.Count - 1}) as Array;
+                            var array = Activator.CreateInstance(targetType, lstVal.Count) as Array;
 
-                            for (var i = 0; i < lstVal.Count - 1; i++)
+                            for (var i = 0; i < lstVal.Count; i++)
                             {
-                                array.SetValue(Deserialize(lstVal.GetValue(i + 1), elementType), i);
+                                array.SetValue(Deserialize(lstVal.GetValue(i ), elementType), i);
                             }
 
                             result = array;
-                        }
-                        else if (targetType == typeof(CallbackDescriptor) && cefType == CefTypes.Callback)
-                        {
-                            result = new CallbackDescriptor
-                            {
-                                FunctionId = lstVal.GetInt64(1)
-                            };
                         }
                     }
                     break;

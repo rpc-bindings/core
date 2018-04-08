@@ -41,6 +41,9 @@
     <None Update="Html\callback_tests.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Html\call_binding_tests.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Html\object_tests.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

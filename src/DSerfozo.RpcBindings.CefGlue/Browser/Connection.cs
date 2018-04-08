@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Reactive.Subjects;
-using System.Threading.Tasks;
 using DSerfozo.RpcBindings.CefGlue.Common;
 using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
-using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Communication;
 using DSerfozo.RpcBindings.Contract.Communication.Model;
 using Xilium.CefGlue;
 

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Reactive.Concurrency;
-using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Communication;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace DSerfozo.RpcBindings.Json
 {
@@ -10,7 +11,7 @@ namespace DSerfozo.RpcBindings.Json
     {
         private static readonly JsonSerializer JsonSerializer = new JsonSerializer
         {
-            ContractResolver = new ShouldSerializeContractResolver()
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
 
         public JsonRpcBindingHost(Func<JsonSerializer, IConnection<JToken>> connectionFactory)

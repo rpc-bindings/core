@@ -1,4 +1,7 @@
-﻿namespace DSerfozo.RpcBindings.Tests.Fixtures
+﻿using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
+
+namespace DSerfozo.RpcBindings.Tests.Fixtures
 {
     public class SimpleClassWithMethods
     {
@@ -12,6 +15,7 @@
 
         }
 
+        [return:BindValue]
         public virtual string MethodWithResult(string input)
         {
             return input;

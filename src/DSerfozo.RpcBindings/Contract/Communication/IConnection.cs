@@ -1,7 +1,7 @@
 ﻿using System;
 using DSerfozo.RpcBindings.Contract.Communication.Model;
 
-namespace DSerfozo.RpcBindings.Contract
+namespace DSerfozo.RpcBindings.Contract.Communication
 {
     public interface IConnection<TMarshal> : IObservable<RpcResponse<TMarshal>>
     {

@@ -1,12 +1,13 @@
 ﻿using System;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 
-namespace DSerfozo.RpcBindings.Contract.Model
+namespace DSerfozo.RpcBindings.Contract.Execution.Model
 {
     public class CallbackExecutionParameters<TMarshal> : IBinder<TMarshal>
     {
         public long Id { get; set; }
 
-        public object[] Parameters { get; set; }
+        public CallbackParameter[] Parameters { get; set; }
 
         public Type ResultTargetType { get; set; }
 

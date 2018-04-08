@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Execution.Model;
 
-namespace DSerfozo.RpcBindings.Contract
+namespace DSerfozo.RpcBindings.Contract.Execution
 {
     public interface IMethodExecutor<TMarshal>
     {

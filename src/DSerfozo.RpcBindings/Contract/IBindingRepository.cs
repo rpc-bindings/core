@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DSerfozo.RpcBindings.Contract.Analyze;
 using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings.Contract
@@ -8,11 +9,9 @@ namespace DSerfozo.RpcBindings.Contract
     {
         IReadOnlyDictionary<long, ObjectDescriptor> Objects { get; }
 
-        ObjectDescriptor AddBinding<TObject>(string key, TObject obj);
+        ObjectDescriptor AddBinding(object obj, AnalyzeOptions analyzeOptions);
 
-        ObjectDescriptor AddBinding(string key, object obj);
-
-        ObjectDescriptor AddDisposableBinding(string key, IDisposable obj);
+        ObjectDescriptor AddDisposableBinding(IDisposable obj, AnalyzeOptions analyzeOptions);
 
         bool TryGetObjectByName(string name, out ObjectDescriptor objectDescriptor);
     }

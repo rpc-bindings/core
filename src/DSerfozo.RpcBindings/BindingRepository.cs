@@ -25,31 +25,21 @@ namespace DSerfozo.RpcBindings
                 new MethodAnalyzer(idGenerator, new CamelCaseNameGenerator()));
         }
 
-        public ObjectDescriptor AddBinding<TObject>(string key, TObject obj)
+        public ObjectDescriptor AddBinding(object obj, AnalyzeOptions options)
         {
             ThrowIfDisposed();
 
-            var objectDescriptor = objectAnalyzer.AnalyzeObject(obj, new AnalyzeOptions{Name = key, AnalyzeProperties = true});
+            var objectDescriptor = objectAnalyzer.AnalyzeObject(obj, options);
             objects.Add(objectDescriptor.Id, objectDescriptor);
 
             return objectDescriptor;
         }
 
-        public ObjectDescriptor AddBinding(string key, object obj)
+        public ObjectDescriptor AddDisposableBinding(IDisposable obj, AnalyzeOptions options)
         {
             ThrowIfDisposed();
 
-            var objectDescriptor = objectAnalyzer.AnalyzeObject(obj, new AnalyzeOptions { Name = key, AnalyzeProperties = true });
-            objects.Add(objectDescriptor.Id, objectDescriptor);
-
-            return objectDescriptor;
-        }
-
-        public ObjectDescriptor AddDisposableBinding(string key, IDisposable obj)
-        {
-            ThrowIfDisposed();
-
-            var objectDescriptor = objectAnalyzer.AnalyzeObject(obj, new AnalyzeOptions { Name = key, AnalyzeProperties = true });
+            var objectDescriptor = objectAnalyzer.AnalyzeObject(obj, options);
             disposables.Add(obj);
             objects.Add(objectDescriptor.Id, objectDescriptor);
 

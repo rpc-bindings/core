@@ -30,31 +30,34 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Util
         public void Execute(CallbackExecution<CefValue> execution)
         {
             CefV8Exception exception = null;
-            var cefV8Values = execution.Parameters.Select(s => v8Serializer.Deserialize(s)).ToArray();
-            var result = function.ExecuteFunctionWithContext(context, null,
-                cefV8Values);
-            var browser = context.GetBrowser();
+            using (new ContextHelper(context))
+            {
+                var cefV8Values = execution.Parameters.Select(s => v8Serializer.Deserialize(s)).ToArray();
+                var result = function.ExecuteFunction(null, cefV8Values);
 
-            if (result == null && function.HasException)
-            {
-                exception = function.GetException();
-                function.ClearException();
-            }
 
-            if (promiseService.IsPromise(result, context))
-            {
-                promiseService.Then(result, context, a => CallbackDone(a, browser, execution.ExecutionId));
-            }
-            else
-            {
-                CallbackDone(new PromiseResult
+                var browser = context.GetBrowser();
+
+                if (result == null && function.HasException)
                 {
-                    Success = result != null,
-                    Result = result,
-                    Error = exception?.Message
-                }, browser, execution.ExecutionId);
+                    exception = function.GetException();
+                    function.ClearException();
+                }
+
+                if (promiseService.IsPromise(result, context))
+                {
+                    promiseService.Then(result, context, a => CallbackDone(a, browser, execution.ExecutionId));
+                }
+                else
+                {
+                    CallbackDone(new PromiseResult
+                    {
+                        Success = result != null,
+                        Result = result,
+                        Error = exception?.Message
+                    }, browser, execution.ExecutionId);
+                }
             }
-            
         }
 
         private void CallbackDone(PromiseResult promiseResult, CefBrowser browser, long executionId)

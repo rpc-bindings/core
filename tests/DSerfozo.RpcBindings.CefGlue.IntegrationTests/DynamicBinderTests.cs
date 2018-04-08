@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.CefGlue.Browser;
 using DSerfozo.RpcBindings.CefGlue.IntegrationTests.Util;
+using DSerfozo.RpcBindings.Extensions;
 using Xilium.CefGlue;
 using Xunit;
 

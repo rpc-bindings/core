@@ -1,7 +1,7 @@
 ﻿using System;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Contract.Marshaling.Model;
-using DSerfozo.RpcBindings.Contract.Model;
 
 namespace DSerfozo.RpcBindings.Marshaling
 {
@@ -30,7 +30,15 @@ namespace DSerfozo.RpcBindings.Marshaling
                 if ((ctx.ObjectValue as CallbackDescriptor)?.FunctionId > 0)
                 {
                     var desc = (CallbackDescriptor)ctx.ObjectValue;
-                    ctx.ObjectValue = callbackFactory.CreateCallback(desc.FunctionId, isTypedCallback ? delegateType : null, ctx.Binder);
+                    try
+                    {
+                        ctx.ObjectValue = callbackFactory.CreateCallback(desc.FunctionId,
+                            isTypedCallback ? delegateType : null, ctx.Binder);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        ctx.ObjectValue = null;
+                    }
                 }
             }
             else

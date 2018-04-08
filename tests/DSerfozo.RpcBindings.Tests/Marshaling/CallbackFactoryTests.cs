@@ -3,7 +3,8 @@ using DSerfozo.RpcBindings.Marshaling;
 using Moq;
 using System;
 using System.Threading.Tasks;
-using DSerfozo.RpcBindings.Contract.Model;
+using DSerfozo.RpcBindings.Contract.Execution;
+using DSerfozo.RpcBindings.Contract.Execution.Model;
 using Xunit;
 
 namespace DSerfozo.RpcBindings.Tests.Marshaling
@@ -23,7 +24,7 @@ namespace DSerfozo.RpcBindings.Tests.Marshaling
         {
             var callbackExecutor = Mock.Of<ICallbackExecutor<object>>();
             var callbackExecutorMock = Mock.Get(callbackExecutor);
-            callbackExecutorMock.Setup(_ => _.Execute(It.Is<CallbackExecutionParameters<object>>(c => c.Id == 9 && (string)c.Parameters[0] == "input"))).Returns(Task.FromResult<object>("result"));
+            callbackExecutorMock.Setup(_ => _.Execute(It.Is<CallbackExecutionParameters<object>>(c => c.Id == 9 && (string)c.Parameters[0].Value == "input"))).Returns(Task.FromResult<object>("result"));
             callbackExecutorMock.SetupGet(_ => _.CanExecute).Returns(true);
             var callbackFactory = new CallbackFactory<object>(callbackExecutor);
 

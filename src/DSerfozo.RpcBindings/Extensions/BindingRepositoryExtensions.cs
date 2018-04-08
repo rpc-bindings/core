@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Analyze;
 using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings.Extensions
@@ -18,17 +19,12 @@ namespace DSerfozo.RpcBindings.Extensions
                 this.wrapped = wrapped;
             }
 
-            public ObjectDescriptor AddBinding<TObject>(string key, TObject obj)
+            public ObjectDescriptor AddBinding(object obj, AnalyzeOptions analyzeOptions)
             {
                 throw new InvalidOperationException("This instance is read-only.");
             }
 
-            public ObjectDescriptor AddBinding(string key, object obj)
-            {
-                throw new InvalidOperationException("This instance is read-only.");
-            }
-
-            public ObjectDescriptor AddDisposableBinding(string key, IDisposable obj)
+            public ObjectDescriptor AddDisposableBinding(IDisposable obj, AnalyzeOptions analyzeOptions)
             {
                 throw new InvalidOperationException("This instance is read-only.");
             }
@@ -47,6 +43,24 @@ namespace DSerfozo.RpcBindings.Extensions
         public static IBindingRepository AsReadOnly(this IBindingRepository @this)
         {
             return new ReadOnlyBindingRepositry(@this);
+        }
+
+        public static ObjectDescriptor AddBinding(this IBindingRepository @this, string name, object obj)
+        {
+            return @this.AddBinding(obj, new AnalyzeOptions
+            {
+                Name = name,
+                AnalyzeProperties = true
+            });
+        }
+
+        public static ObjectDescriptor AddDisposableBinding(this IBindingRepository @this, string name, IDisposable obj)
+        {
+            return @this.AddDisposableBinding(obj, new AnalyzeOptions
+            {
+                Name = name,
+                AnalyzeProperties = true
+            });
         }
     }
 }
