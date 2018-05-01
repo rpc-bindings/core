@@ -8,12 +8,15 @@ using DSerfozo.RpcBindings.Contract.Execution;
 using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Execution.Model;
 using DSerfozo.RpcBindings.Extensions;
+using DSerfozo.RpcBindings.Logging;
 using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings.Execution
 {
     public class MethodExecutor<TMarshal> : IMethodExecutor<TMarshal>, IBinder<TMarshal>
     {
+        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
+
         private readonly IReadOnlyDictionary<long, ObjectDescriptor> objects;
         private readonly BindingDelegate<TMarshal> bindingDelegate;
 
@@ -94,10 +97,12 @@ namespace DSerfozo.RpcBindings.Execution
             }
             catch(TargetInvocationException e)
             {
+                Log.ErrorException("Execute", e);
                 result.Error = e.InnerException?.Message;
             }
             catch(Exception e)
             {
+                Log.ErrorException("Execute", e);
                 result.Error = e.Message;
             }
 

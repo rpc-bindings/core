@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Contract.Execution;
 using DSerfozo.RpcBindings.Contract.Execution.Model;
 using DSerfozo.RpcBindings.Contract.Marshaling;

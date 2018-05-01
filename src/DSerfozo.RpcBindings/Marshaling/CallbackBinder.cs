@@ -1,5 +1,4 @@
 ﻿using System;
-using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Contract.Marshaling.Model;
 

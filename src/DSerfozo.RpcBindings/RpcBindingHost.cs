@@ -11,6 +11,7 @@ using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Execution;
 using DSerfozo.RpcBindings.Execution.Model;
 using DSerfozo.RpcBindings.Extensions;
+using DSerfozo.RpcBindings.Logging;
 using DSerfozo.RpcBindings.Marshaling;
 using DSerfozo.RpcBindings.Model;
 
@@ -18,6 +19,8 @@ namespace DSerfozo.RpcBindings
 {
     public abstract class RpcBindingHost<TMarshal> : IDisposable
     {
+        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
+
         private readonly CompositeDisposable disposables = new CompositeDisposable();
         private readonly IConnection<TMarshal> connection;
         private readonly IMethodExecutor<TMarshal> methodExecutor;
@@ -132,6 +135,7 @@ namespace DSerfozo.RpcBindings
             }
             catch (Exception e)
             {
+                Log.ErrorException("ResolveDynamicObject", e);
                 response.Exception = e.Message;
             }
 
