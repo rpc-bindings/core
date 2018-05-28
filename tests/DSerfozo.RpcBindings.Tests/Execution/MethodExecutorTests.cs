@@ -15,35 +15,38 @@ namespace DSerfozo.RpcBindings.Tests.Execution
     public class MethodExecutorTests
     {
         [Fact]
-        public Task ThrowsForNonExistentObject()
+        public async Task NonExistentObjectError()
         {
-            return Assert.ThrowsAsync<InvalidOperationException>(async () => 
+            var methodExecutor = new MethodExecutor<object>(
+                new ReadOnlyDictionary<long, ObjectDescriptor>(new Dictionary<long, ObjectDescriptor>()),
+                context => { });
+            var result = await methodExecutor.Execute(new MethodExecution<object>()
             {
-                var methodExecutor = new MethodExecutor<object>(new ReadOnlyDictionary<long, ObjectDescriptor>(new Dictionary<long, ObjectDescriptor>()), context => { });
-                await methodExecutor.Execute(new MethodExecution<object>()
-                {
-                    ObjectId = 1
-                });
+                ObjectId = 1
             });
+
+            Assert.Equal("Invalid object.", result.Error);
+            Assert.False(result.Success);
         }
 
         [Fact]
-        public Task ThrowsForNonExistentMethod()
+        public async Task NonExistentMethodError()
         {
-            return Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            var methodExecutor = new MethodExecutor<object>(
+                new ReadOnlyDictionary<long, ObjectDescriptor>(
+                    new Dictionary<long, ObjectDescriptor>()
+                    {
+                        {1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()).WithId(1).Get()}
+                    }), context => { });
+            var result = await methodExecutor.Execute(new MethodExecution<object>()
             {
-                var methodExecutor = new MethodExecutor<object>(
-                    new ReadOnlyDictionary<long, ObjectDescriptor>(
-                        new Dictionary<long, ObjectDescriptor>()
-                        {
-                            { 1, ObjectDescriptor.Create().WithMethods(new List<MethodDescriptor>()).WithId(1).Get() }
-                        }), context => { });
-                await methodExecutor.Execute(new MethodExecution<object>()
-                {
-                    ObjectId = 1,
-                    MethodId = 2
-                });
+                ObjectId = 1,
+                MethodId = 2
             });
+
+
+            Assert.Equal("Invalid function.", result.Error);
+            Assert.False(result.Success);
         }
 
         [Fact]
@@ -66,7 +69,7 @@ namespace DSerfozo.RpcBindings.Tests.Execution
                 Parameters = new object[] { }
             });
 
-            Assert.Equal("Parameter mismatch.", result.Error);
+            Assert.Equal("Parameter count mismatch.", result.Error);
             Assert.False(result.Success);
         }
 

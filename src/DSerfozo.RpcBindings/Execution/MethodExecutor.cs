@@ -30,23 +30,26 @@ namespace DSerfozo.RpcBindings.Execution
 
         public async Task<MethodResult<TMarshal>> Execute(MethodExecution<TMarshal> methodExcecution)
         {
-            if(!objects.TryGetValue(methodExcecution.ObjectId, out var objectDescriptor))
-            {
-                throw new InvalidOperationException("");
-            }
-
-            if(!objectDescriptor.Methods.TryGetValue(methodExcecution.MethodId, out var methodDescriptor))
-            {
-                throw new InvalidOperationException("");
-            }
-
             var result = new MethodResult<TMarshal>
             {
                 ExecutionId = methodExcecution.ExecutionId
             };
+
+            if(!objects.TryGetValue(methodExcecution.ObjectId, out var objectDescriptor))
+            {
+                result.Error = "Invalid object.";
+                return result;
+            }
+
+            if(!objectDescriptor.Methods.TryGetValue(methodExcecution.MethodId, out var methodDescriptor))
+            {
+                result.Error = "Invalid function.";
+                return result;
+            }
+
             if(methodDescriptor.ParameterCount > 0 && methodDescriptor.ParameterCount != methodExcecution.Parameters.Length)
             {
-                result.Error = "Parameter mismatch.";
+                result.Error = "Parameter count mismatch.";
                 return result;
             }
 
