@@ -1,14 +1,9 @@
-﻿using DSerfozo.RpcBindings.Contract;
-using DSerfozo.RpcBindings.Marshaling;
-using DSerfozo.RpcBindings.Model;
-using Moq;
+﻿using Moq;
 using System;
-using System.Linq;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract.Analyze;
+using DSerfozo.RpcBindings.Contract.Communication;
 using DSerfozo.RpcBindings.Contract.Execution.Model;
 using DSerfozo.RpcBindings.Contract.Marshaling;
 using DSerfozo.RpcBindings.Contract.Marshaling.Model;
@@ -23,7 +18,9 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public void CallbackDeleted()
         {
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => true, Mock.Of<IObservable<CallbackResult<object>>>());
+            var mock = new Mock<IConnectionAvailability>();
+            mock.SetupGet(_ => _.IsOpen).Returns(true);
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), mock.Object, Mock.Of<IObservable<CallbackResult<object>>>());
 
             DeleteCallback delete = null;
             ((IObservable<DeleteCallback>)executor).Subscribe(
@@ -37,10 +34,12 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public void ExecuteSent()
         {
+            var mock = new Mock<IConnectionAvailability>();
+            mock.SetupGet(_ => _.IsOpen).Returns(true);
             var idGenerator = Mock.Of<IIdGenerator>();
             Mock.Get(idGenerator).Setup(_ => _.GetNextId()).Returns(1);
 
-            var executor = new CallbackExecutor<object>(idGenerator, () => true, Mock.Of<IObservable<CallbackResult<object>>>());
+            var executor = new CallbackExecutor<object>(idGenerator, mock.Object, Mock.Of<IObservable<CallbackResult<object>>>());
 
             CallbackExecution<object> exec = null;
             ((IObservable<CallbackExecution<object>>)executor).Subscribe(
@@ -68,7 +67,9 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public void ParametersBound()
         {
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => true, Mock.Of<IObservable<CallbackResult<object>>>());
+            var mock = new Mock<IConnectionAvailability>();
+            mock.SetupGet(_ => _.IsOpen).Returns(true);
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), mock.Object, Mock.Of<IObservable<CallbackResult<object>>>());
 
             CallbackExecution<object> exec = null;
             ((IObservable<CallbackExecution<object>>)executor).Subscribe(
@@ -98,7 +99,9 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public void ParametersBoundAndAnalyzed()
         {
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => true, Mock.Of<IObservable<CallbackResult<object>>>());
+            var mock = new Mock<IConnectionAvailability>();
+            mock.SetupGet(_ => _.IsOpen).Returns(true);
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), mock.Object, Mock.Of<IObservable<CallbackResult<object>>>());
 
             CallbackExecution<object> exec = null;
             ((IObservable<CallbackExecution<object>>)executor).Subscribe(
@@ -132,8 +135,10 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public async Task ResponseHandled()
         {
+            var mock = new Mock<IConnectionAvailability>();
+            mock.SetupGet(_ => _.IsOpen).Returns(true);
             var responses = new Subject<CallbackResult<object>>();
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => true, responses);
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), mock.Object, responses);
 
             void Binder(BindingContext<object> context)
             {
@@ -165,8 +170,10 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public async Task ErrorHandled()
         {
+            var mock = new Mock<IConnectionAvailability>();
+            mock.SetupGet(_ => _.IsOpen).Returns(true);
             var responses = new Subject<CallbackResult<object>>();
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => true, responses);
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), mock.Object, responses);
 
             var task = executor.Execute(new CallbackExecutionParameters<object>
             {
@@ -189,8 +196,10 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public void CanExecuteReturned()
         {
+            var mock = new Mock<IConnectionAvailability>();
+            mock.SetupGet(_ => _.IsOpen).Returns(false);
             var responses = new Subject<CallbackResult<object>>();
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => false, responses);
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), mock.Object, responses);
 
             Assert.False(executor.CanExecute);
         }
@@ -198,10 +207,12 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public async Task ExecuteFails()
         {
+            var mock = new Mock<IConnectionAvailability>();
+            mock.SetupGet(_ => _.IsOpen).Returns(false);
             var idGenerator = Mock.Of<IIdGenerator>();
             Mock.Get(idGenerator).Setup(_ => _.GetNextId()).Returns(1);
 
-            var executor = new CallbackExecutor<object>(idGenerator, () => false, Mock.Of<IObservable<CallbackResult<object>>>());
+            var executor = new CallbackExecutor<object>(idGenerator, mock.Object, Mock.Of<IObservable<CallbackResult<object>>>());
 
             CallbackExecution<object> exec = null;
             ((IObservable<CallbackExecution<object>>)executor).Subscribe(
@@ -219,7 +230,9 @@ namespace DSerfozo.RpcBindings.Tests.Execution
         [Fact]
         public void DeletionFails()
         {
-            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), () => false, Mock.Of<IObservable<CallbackResult<object>>>());
+            var mock = new Mock<IConnectionAvailability>();
+            mock.SetupGet(_ => _.IsOpen).Returns(false);
+            var executor = new CallbackExecutor<object>(Mock.Of<IIdGenerator>(), mock.Object, Mock.Of<IObservable<CallbackResult<object>>>());
 
             DeleteCallback delete = null;
             ((IObservable<DeleteCallback>)executor).Subscribe(

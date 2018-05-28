@@ -1,7 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DSerfozo.RpcBindings.CefGlue.Common;
 using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
-using DSerfozo.RpcBindings.CefGlue.Renderer.Serialization;
-using DSerfozo.RpcBindings.CefGlue.Renderer.Services;
 using DSerfozo.RpcBindings.CefGlue.Renderer.Util;
 using DSerfozo.RpcBindings.Contract.Communication.Model;
 using DSerfozo.RpcBindings.Execution.Model;
@@ -14,10 +14,10 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Handlers
     {
         private readonly long objectId;
         private readonly MethodDescriptor descriptor;
-        private readonly V8Serializer v8Serializer;
+        private readonly ObjectSerializer v8Serializer;
         private readonly SavedValueFactory<Promise> functionCallRegistry;
 
-        public FunctionHandler(long objectId, MethodDescriptor descriptor, V8Serializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
+        public FunctionHandler(long objectId, MethodDescriptor descriptor, ObjectSerializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
         {
             this.objectId = objectId;
             this.descriptor = descriptor;
@@ -46,13 +46,17 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Handlers
                     ExecutionId = executionId,
                     MethodId = descriptor.Id,
                     ObjectId = objectId,
-                    Parameters = arguments.Select(a => v8Serializer.Serialize(a)).ToArray()
+                    Parameters = arguments.Select(a => v8Serializer.Serialize(a, new HashSet<object>())).ToArray()
                 }
             };
 
             using (var context = CefV8Context.GetCurrentContext())
             {
-                context.GetBrowser().SendProcessMessage(CefProcessId.Browser, message.ToCefProcessMessage());
+                var msg = CefProcessMessage.Create(Messages.RpcResponseMessage);
+                var serialized = v8Serializer.Serialize(message, new HashSet<object>());
+                msg.Arguments.SetValue(0, serialized.Copy());
+
+                context.GetBrowser().SendProcessMessage(CefProcessId.Browser, msg);
             }
 
             return true;

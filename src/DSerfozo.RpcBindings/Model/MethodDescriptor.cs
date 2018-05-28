@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Contract.Marshaling;
 
 namespace DSerfozo.RpcBindings.Model
 {
     [DataContract]
+    [TypeId(TypeId)]
     public sealed class MethodDescriptor
     {
+        public const string TypeId = "{8B5C3CDA-5633-4BDD-9AF6-B88142F38203}";
+
         public sealed class Builder
         {
             private readonly MethodDescriptor constructed;

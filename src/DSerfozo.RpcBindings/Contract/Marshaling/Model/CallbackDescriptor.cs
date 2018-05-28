@@ -3,6 +3,7 @@
 namespace DSerfozo.RpcBindings.Contract.Marshaling.Model
 {
     [DataContract]
+    [TypeId(TypeId)]
     public class CallbackDescriptor
     {
         public const string TypeId = "6412774B-E8B7-4B29-B699-877A532C9708";

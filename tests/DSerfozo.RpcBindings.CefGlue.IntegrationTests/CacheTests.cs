@@ -65,7 +65,7 @@ namespace DSerfozo.RpcBindings.CefGlue.IntegrationTests
                 int count = 0;
                 browser.CefClient.ProcessMessageReceived += (sender, args) =>
                 {
-                    if(args.Message.Name == Messages.DynamicObjectRequestMessageName)
+                    if(args.Message.Name == Messages.RpcResponseMessage)
                     {
                         count++;
                     }

@@ -1,5 +1,5 @@
-﻿using DSerfozo.RpcBindings.CefGlue.Renderer.Handlers;
-using DSerfozo.RpcBindings.CefGlue.Renderer.Serialization;
+﻿using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
+using DSerfozo.RpcBindings.CefGlue.Renderer.Handlers;
 using DSerfozo.RpcBindings.CefGlue.Renderer.Util;
 using DSerfozo.RpcBindings.Model;
 using Xilium.CefGlue;
@@ -10,10 +10,10 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Binding
     {
         private readonly long objectId;
         private readonly MethodDescriptor descriptor;
-        private readonly V8Serializer v8Serializer;
+        private readonly ObjectSerializer v8Serializer;
         private readonly SavedValueFactory<Promise> functionCallRegistry;
 
-        public FunctionBinder(long objectId, MethodDescriptor descriptor, V8Serializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
+        public FunctionBinder(long objectId, MethodDescriptor descriptor, ObjectSerializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
         {
             this.objectId = objectId;
             this.descriptor = descriptor;

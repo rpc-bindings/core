@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.Contract;
 using DSerfozo.RpcBindings.Contract.Analyze;
+using DSerfozo.RpcBindings.Contract.Communication;
 using DSerfozo.RpcBindings.Contract.Execution;
 using DSerfozo.RpcBindings.Contract.Execution.Model;
 using DSerfozo.RpcBindings.Contract.Marshaling;
@@ -34,11 +35,11 @@ namespace DSerfozo.RpcBindings.Execution
         private readonly ISubject<CallbackExecution<TMarshal>> callbackExecutionSubject = new Subject<CallbackExecution<TMarshal>>();
         private readonly ISubject<DeleteCallback> deleteSubject = new Subject<DeleteCallback>();
         private readonly IIdGenerator idGenerator;
-        private readonly Func<bool> connectionAvailable;
+        private readonly IConnectionAvailability connectionAvailable;
 
-        public bool CanExecute => connectionAvailable();
+        public bool CanExecute => connectionAvailable.IsOpen;
 
-        public CallbackExecutor(IIdGenerator idGenerator, Func<bool> connectionAvailable, IObservable<CallbackResult<TMarshal>> resultStream)
+        public CallbackExecutor(IIdGenerator idGenerator, IConnectionAvailability connectionAvailable, IObservable<CallbackResult<TMarshal>> resultStream)
         {
             resultStream.Subscribe(OnCallbackResult);
             this.idGenerator = idGenerator;

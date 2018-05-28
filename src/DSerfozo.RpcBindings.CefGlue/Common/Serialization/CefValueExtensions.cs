@@ -9,6 +9,114 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
 
         public static bool IsType(this CefValue @this, CefTypes type)
         {
+            return IsType(() => @this, type);
+        }
+
+        public static bool IsType(this CefListValue @this, int index, CefTypes type)
+        {
+            return IsType(() => @this.GetValue(index), type);
+        }
+
+        public static bool IsType(this CefDictionaryValue @this, string index, CefTypes type)
+        {
+            return IsType(() => @this.GetValue(index), type);
+        }
+
+        public static void SetTime(this CefValue @this, DateTime value)
+        {
+            SetTime(_ => @this.SetBinary(_), value);
+        }
+
+        public static void SetTime<TIndex>(this CefValue @this, DateTime value, TIndex index = default(TIndex))
+        {
+            SetTime(_ =>
+            {
+                var valueType = @this.GetValueType();
+                switch (valueType)
+                {
+                    case CefValueType.List:
+                        using (var listValue = @this.GetList())
+                        {
+                            if (typeof(TIndex) == typeof(int))
+                            {
+                                listValue.SetBinary((int)Convert.ChangeType(index, typeof(int)), _);
+                            }
+                        }
+                        break;
+                    case CefValueType.Dictionary:
+                        using (var dictValue = @this.GetDictionary())
+                        {
+                            if (typeof(TIndex) == typeof(string))
+                            {
+                                dictValue.SetBinary((string)Convert.ChangeType(index, typeof(string)), _);
+                            }
+                        }
+                        break;
+                    default:
+                        @this.SetBinary(_);
+                        break;
+                }
+            }, value);
+        }
+
+        public static void SetTime(this CefListValue @this, int index, DateTime value)
+        {
+            SetTime(_ => @this.SetBinary(index, _), value);
+        }
+
+        public static void SetTime(this CefDictionaryValue @this, string index, DateTime value)
+        {
+            SetTime(_ => @this.SetBinary(index, _), value);
+        }
+
+        public static DateTime GetTime(this CefValue @this)
+        {
+            return GetTime(() => @this);
+        }
+
+        public static DateTime GetTime(this CefListValue @this, int index)
+        {
+            return GetTime(() => @this.GetValue(index));
+        }
+
+        public static DateTime GetTime(this CefDictionaryValue @this, string index)
+        {
+            return GetTime(() => @this.GetValue(index));
+        }
+
+        public static long GetInt64(this CefValue @this)
+        {
+            return GetInt64(() => @this);
+        }
+
+        public static long GetInt64(this CefListValue @this, int index)
+        {
+            return GetInt64(() => @this.GetValue(index));
+        }
+
+        public static long GetInt64(this CefDictionaryValue @this, string index)
+        {
+            return GetInt64(() => @this.GetValue(index));
+        }
+
+        public static void SetInt64(this CefValue @this, long value)
+        {
+            SetInt64(_ => @this.SetBinary(_), value);
+        }
+
+        public static void SetInt64(this CefListValue @this, int index, long value)
+        {
+            SetInt64(_ => @this.SetBinary(index, _), value);
+        }
+
+        public static void SetInt64(this CefDictionaryValue @this, string index, long value)
+        {
+            SetInt64(_ => @this.SetBinary(index, _), value);
+        }
+
+        private static bool IsType(Func<CefValue> getValue, CefTypes type)
+        {
+            var @this = getValue();
             if (@this.GetValueType() != CefValueType.Binary)
                 return false;
 
@@ -21,7 +129,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
             }
         }
 
-        public static void SetTime(this CefValue @this, DateTime value)
+        private static void SetTime(Action<CefBinaryValue> setValue, DateTime value)
         {
             var totalSecondsBytes = BitConverter.GetBytes(value.ToBinary());
             var buffer = new byte[totalSecondsBytes.Length + 1];
@@ -30,12 +138,13 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
 
             using (var binaryValue = CefBinaryValue.Create(buffer))
             {
-                @this.SetBinary(binaryValue);
+                setValue(binaryValue);
             }
         }
 
-        public static DateTime GetTime(this CefValue @this)
+        private static DateTime GetTime(Func<CefValue> getValue)
         {
+            var @this = getValue();
             if (@this.GetValueType() != CefValueType.Binary)
                 return default(DateTime);
 
@@ -48,8 +157,9 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
             }
         }
 
-        public static long GetInt64(this CefValue @this)
+        private static long GetInt64(Func<CefValue> getValue)
         {
+            var @this = getValue();
             if (@this.GetValueType() != CefValueType.Binary)
                 return 0L;
 
@@ -62,7 +172,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
             }
         }
 
-        public static void SetInt64(this CefValue @this, long value)
+        private static void SetInt64(Action<CefBinaryValue> setValue, long value)
         {
             var buffer= new byte[sizeof(long) + 1];
             buffer[0] = (byte) CefTypes.Int64;
@@ -71,7 +181,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Common.Serialization
 
             using (var binaryValue = CefBinaryValue.Create(buffer))
             {
-                @this.SetBinary(binaryValue);
+                setValue(binaryValue);
             }
         }
     }

@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using DSerfozo.RpcBindings.CefGlue.Common;
 using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
-using DSerfozo.RpcBindings.CefGlue.Renderer.Serialization;
 using DSerfozo.RpcBindings.CefGlue.Renderer.Services;
 using DSerfozo.RpcBindings.Contract.Communication.Model;
 using DSerfozo.RpcBindings.Execution.Model;
@@ -13,12 +14,12 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Util
     {
         private readonly CefV8Value function;
         private readonly PromiseService promiseService;
-        private readonly V8Serializer v8Serializer;
+        private readonly ObjectSerializer v8Serializer;
         private readonly CefV8Context context;
 
         public CefV8Context Context => context;
 
-        public Callback(CefV8Value function,  PromiseService promiseService, V8Serializer v8Serializer)
+        public Callback(CefV8Value function,  PromiseService promiseService, ObjectSerializer v8Serializer)
         {
             this.function = function;
             this.promiseService = promiseService;
@@ -32,7 +33,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Util
             CefV8Exception exception = null;
             using (new ContextHelper(context))
             {
-                var cefV8Values = execution.Parameters.Select(s => v8Serializer.Deserialize(s)).ToArray();
+                var cefV8Values = execution.Parameters.Select(s => (CefV8Value)v8Serializer.Deserialize(s, typeof(CefV8Value))).ToArray();
                 var result = function.ExecuteFunction(null, cefV8Values);
 
 
@@ -70,17 +71,22 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Util
 
             if (promiseResult.Success)
             {
-                callbackResult.Result = v8Serializer.Serialize(promiseResult.Result);
+                callbackResult.Result = v8Serializer.Serialize(promiseResult.Result, new HashSet<object>());
             }
             else if(!string.IsNullOrWhiteSpace(promiseResult.Error))
             {
                 callbackResult.Error = promiseResult.Error;
             }
 
-            browser.SendProcessMessage(CefProcessId.Browser, new RpcResponse<CefValue>
+            var response = new RpcResponse<CefValue>
             {
                 CallbackResult = callbackResult
-            }.ToCefProcessMessage());
+            };
+            var msg = CefProcessMessage.Create(Messages.RpcResponseMessage);
+            var serialized = v8Serializer.Serialize(response, new HashSet<object>());
+            msg.Arguments.SetValue(0, serialized);
+
+            browser.SendProcessMessage(CefProcessId.Browser, msg);
         }
 
         public void Dispose()

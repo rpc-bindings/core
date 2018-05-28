@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
 using DSerfozo.RpcBindings.CefGlue.Renderer.Model;
-using DSerfozo.RpcBindings.CefGlue.Renderer.Serialization;
 using DSerfozo.RpcBindings.CefGlue.Renderer.Util;
 using DSerfozo.RpcBindings.Model;
 using Xilium.CefGlue;
@@ -10,17 +10,17 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Binding
 {
     public class ObjectBinder
     {
-        private readonly V8Serializer v8Serializer;
+        private readonly ObjectSerializer v8Serializer;
         private readonly IDictionary<long, FunctionBinder> functions;
         private readonly List<CefPropertyDescriptor> propertyDescriptors;
 
-        public ObjectBinder(ObjectDescriptor descriptor, V8Serializer v8Serializer, SavedValueFactory<Promise> functionCallRegistry)
+        public ObjectBinder(ObjectDescriptor descriptor, ObjectSerializer serializer, SavedValueFactory<Promise> functionCallRegistry)
         {
-            this.v8Serializer = v8Serializer;
-            functions = descriptor.Methods?.Select(m => new {m.Key, Value = new FunctionBinder(descriptor.Id, m.Value, v8Serializer, functionCallRegistry)})
+            v8Serializer = serializer;
+            functions = descriptor.Methods?.Select(m => new {m.Key, Value = new FunctionBinder(descriptor.Id, m.Value, serializer, functionCallRegistry)})
                 .ToDictionary(k => k.Key, v => v.Value);
 
-            propertyDescriptors = descriptor.Properties.Select(p => p.Value).OfType<CefPropertyDescriptor>().ToList();
+            propertyDescriptors = descriptor.Properties?.Select(p => p.Value).OfType<CefPropertyDescriptor>().ToList();
         }
 
         public CefV8Value BindToNew()
@@ -29,13 +29,13 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer.Binding
 
             functions?.Values.ToList().ForEach(m => m.Bind(obj));
 
-            propertyDescriptors.ForEach(c =>
+            propertyDescriptors?.ForEach(c =>
             {
-                var value = v8Serializer.Deserialize(c.ListValue);
+                var value = (CefV8Value) v8Serializer.Deserialize(c.ListValue, typeof(CefV8Value));
                 obj.SetValue(c.Name, value, CefV8PropertyAttribute.ReadOnly);
                 c.ListValue.Dispose();
             });
-            propertyDescriptors.Clear();
+            propertyDescriptors?.Clear();
 
             return obj;
         }

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 
 namespace DSerfozo.RpcBindings.Model
 {
     [DataContract]
+    [TypeId(TypeId)]
     public class PropertyDescriptor
     {
+        public const string TypeId = "{C3A2CB90-7C7C-439C-9B91-A4E22FACABE9}";
+
         public sealed class Builder
         {
             private readonly PropertyDescriptor constructed = new PropertyDescriptor()
@@ -86,11 +90,6 @@ namespace DSerfozo.RpcBindings.Model
         public Action<object, object> Setter { get; private set; }
 
         public Type Type { get; private set; }
-
-        protected PropertyDescriptor()
-        {
-            
-        }
 
         public static Builder Create()
         {

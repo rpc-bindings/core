@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DSerfozo.RpcBindings.CefGlue.Browser;
 using DSerfozo.RpcBindings.CefGlue.Common;
+using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
 using DSerfozo.RpcBindings.Contract;
 using Xilium.CefGlue;
 
@@ -72,11 +70,6 @@ namespace DSerfozo.RpcBindings.CefGlue.IntegrationTests.Util
                 {
                     Loaded?.Invoke(this, EventArgs.Empty);
                 }
-            }
-
-            protected override void OnLoadingStateChange(CefBrowser browser, bool isLoading, bool canGoBack, bool canGoForward)
-            {
-                base.OnLoadingStateChange(browser, isLoading, canGoBack, canGoForward);
             }
         }
 
@@ -204,6 +197,7 @@ namespace DSerfozo.RpcBindings.CefGlue.IntegrationTests.Util
         private readonly Task<CefBrowser> browser;
         private readonly Client client;
         private readonly CefGlueRpcBindingHost rpcBindingHost;
+        private readonly ITypeSerializer objectDescriptorSerializer;
 
         public Client CefClient => client;
 
@@ -231,7 +225,7 @@ namespace DSerfozo.RpcBindings.CefGlue.IntegrationTests.Util
                 CefBrowserHost.CreateBrowser(windowInfo, client, cefBrowserSettings);
             }
 
-            rpcBindingHost = new CefGlueRpcBindingHost(new Connection());
+            rpcBindingHost = new CefGlueRpcBindingHost(new Connection(new ObjectSerializer()));
 
             InitConnection();
         }

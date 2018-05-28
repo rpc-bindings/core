@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DSerfozo.RpcBindings.CefGlue.Common;
 using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
 using DSerfozo.RpcBindings.CefGlue.Renderer.Binding;
 using DSerfozo.RpcBindings.CefGlue.Renderer.Serialization;
@@ -19,10 +20,10 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer
         private readonly Dictionary<string, ObjectDescriptor> objectDescriptorCache =
             new Dictionary<string, ObjectDescriptor>();
 
+        private readonly ObjectSerializer objectSerializer = new RendererObjectSerializer();
         private readonly SavedValueRegistry<Callback> callbackRegistry = new SavedValueRegistry<Callback>();
         private readonly SavedValueFactory<Promise> functionCallPromiseRegistry;
         private readonly SavedValueFactory<Promise> dynamicObjectPromiseRegistry;
-        private readonly V8Serializer v8Serializer;
         private readonly CefBrowser browser;
 
         public BrowserController(CefBrowser browser, PromiseService promiseService)
@@ -30,12 +31,19 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer
             this.browser = browser;
             functionCallPromiseRegistry = new SavedValueFactory<Promise>(promiseService.CreatePromise);
             dynamicObjectPromiseRegistry = new SavedValueFactory<Promise>(promiseService.CreatePromise);
-            v8Serializer = new V8Serializer(promiseService, callbackRegistry, functionCallPromiseRegistry);
+
+            objectSerializer.Serializers.Insert(0, new V8Serializer(promiseService, callbackRegistry));
+            objectSerializer.Deserializers.Insert(0, new V8Deserializer(functionCallPromiseRegistry));
         }
 
         public bool OnProcessMessage(CefProcessMessage message)
         {
-            var response = RpcMessageSerializer.CreateRpcRequest(message, v8Serializer);
+            if (message.Name != Messages.RpcRequestMessage)
+            {
+                return false;
+            }
+
+            var response = (RpcRequest<CefValue>)objectSerializer.Deserialize(message.Arguments.GetValue(0), typeof(RpcRequest<CefValue>));
             var handled = false;
             if (response?.CallbackExecution != null)
             {
@@ -93,7 +101,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer
                             }
                         };
 
-                        browser.SendProcessMessage(CefProcessId.Browser, response.ToCefProcessMessage());
+                        SendResponse(response);
                     }
                 }
                 else
@@ -142,6 +150,16 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer
             browser.Dispose();
         }
 
+        private void SendResponse(RpcResponse<CefValue> response)
+        {
+            var msg = CefProcessMessage.Create(Messages.RpcResponseMessage);
+            var serialized = objectSerializer.Serialize(response, new HashSet<object>());
+            msg.Arguments.SetValue(0, serialized);
+
+            browser.SendProcessMessage(CefProcessId.Browser, msg);
+        }
+
+
         private void HandleBindingResult(RpcRequest<CefValue> response)
         {
             var dynamicObjectResult = response.DynamicObjectResult;
@@ -178,7 +196,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer
                 if (!frameObjectCache.TryGetValue(objectDescriptor.Name, out var result))
                 {
                     result = new ObjectBinder(objectDescriptor,
-                        v8Serializer,
+                        objectSerializer,
                         functionCallPromiseRegistry).BindToNew();
                     frameObjectCache.Add(objectDescriptor.Name, result);
                 }
@@ -196,7 +214,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer
                 {
                     if (response.MethodResult.Success)
                     {
-                        promise.Resolve(v8Serializer.Deserialize(response.MethodResult.Result));
+                        promise.Resolve((CefV8Value)objectSerializer.Deserialize(response.MethodResult.Result, typeof(CefV8Value)));
                     }
                     else
                     {
@@ -225,7 +243,7 @@ namespace DSerfozo.RpcBindings.CefGlue.Renderer
                     }
                 };
 
-                browser.SendProcessMessage(CefProcessId.Renderer, rpcResponse.ToCefProcessMessage());
+                SendResponse(rpcResponse);
             }
         }
     }

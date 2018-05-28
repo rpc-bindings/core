@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Compile Remove="Common\Serialization\ComplexObjectSerializer.cs" />
+    <Compile Remove="Common\Serialization\RpcMessageSerializer.cs" />
   </ItemGroup>
 
   <ItemGroup>

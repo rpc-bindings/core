@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using DSerfozo.RpcBindings.Contract;
+using DSerfozo.RpcBindings.Contract.Marshaling;
 
 namespace DSerfozo.RpcBindings.Model
 {
     [DataContract]
+    [TypeId(TypeId)]
     public sealed class ObjectDescriptor
     {
         public const string TypeId = "5F6FA749-5CD1-4A51-9F69-0B9657C55ECC";
@@ -73,10 +74,6 @@ namespace DSerfozo.RpcBindings.Model
         public IDictionary<long, MethodDescriptor> Methods { get; private set; }
 
         public object Object { get; private set; }
-
-        private ObjectDescriptor()
-        {
-        }
 
         public static Builder Create()
         {

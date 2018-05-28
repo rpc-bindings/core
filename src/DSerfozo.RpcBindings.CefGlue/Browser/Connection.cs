@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Subjects;
 using DSerfozo.RpcBindings.CefGlue.Common;
 using DSerfozo.RpcBindings.CefGlue.Common.Serialization;
@@ -11,10 +12,17 @@ namespace DSerfozo.RpcBindings.CefGlue.Browser
     public class Connection : IConnection<CefValue>, IDisposable
     {
         private readonly ISubject<RpcResponse<CefValue>> rpcResponseSubject = new Subject<RpcResponse<CefValue>>();
+        private readonly ObjectSerializer objectSerializer;
         private CefBrowser browser;
         private MessageClient client;
+        private bool browserDisposed;
 
-        public bool IsOpen => browser != null;
+        public bool IsOpen => browser != null && !browserDisposed;
+
+        public Connection(ObjectSerializer objectSerializer)
+        {
+            this.objectSerializer = objectSerializer;
+        }
 
         public void Initialize(CefBrowser browser, MessageClient client)
         {
@@ -27,25 +35,40 @@ namespace DSerfozo.RpcBindings.CefGlue.Browser
         private void ClientOnProcessMessageReceived(object sender, ProcessMessageReceivedArgs e)
         {
             var message = e.Message;
-            var rpcResponse = RpcMessageSerializer.CreateRpcResponse(message);
 
-            if (rpcResponse != null)
+            if (message.Name == Messages.RpcResponseMessage)
             {
-                e.Handled = true;
-                rpcResponseSubject.OnNext(rpcResponse);
+                var response = message.Arguments.GetValue(0);
+
+                var rpcResponse =
+                    (RpcResponse<CefValue>) objectSerializer.Deserialize(response, typeof(RpcResponse<CefValue>));
+
+                if (rpcResponse != null)
+                {
+                    e.Handled = true;
+                    rpcResponseSubject.OnNext(rpcResponse);
+                }
             }
         }
 
         public void Send(RpcRequest<CefValue> rpcRequest)
         {
-            var message = rpcRequest.ToCefProcessMessage();
-            if (message != null)
+            if (browserDisposed)
+                return;
+
+            var message = CefProcessMessage.Create(Messages.RpcRequestMessage);
+            try
             {
+                message.Arguments.SetValue(0, objectSerializer.Serialize(rpcRequest, new HashSet<object>()));
+
                 browser.SendProcessMessage(CefProcessId.Renderer, message);
             }
-            else
+            catch (NullReferenceException)
             {
-                throw new Exception();
+                //when the browser is already disposed
+                //this can happen from a finalized callback for example
+                browserDisposed = true;
+                message.Dispose();
             }
         }
 

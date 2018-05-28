@@ -17,7 +17,7 @@ using DSerfozo.RpcBindings.Model;
 
 namespace DSerfozo.RpcBindings
 {
-    public abstract class RpcBindingHost<TMarshal> : IDisposable
+    public class RpcBindingHost<TMarshal> : IDisposable
     {
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
 
@@ -37,20 +37,20 @@ namespace DSerfozo.RpcBindings
 
         public ICallbackExecutor<TMarshal> CallbackExecutor => callbackExecutor;
 
-        protected RpcBindingHost(IConnection<TMarshal> connection, IPlatformBinder<TMarshal> parameterBinder, IScheduler baseScheduler)
+        public RpcBindingHost(IConnection<TMarshal> connection, IPlatformBinder<TMarshal> parameterBinder, IScheduler baseScheduler)
         {
             this.connection = connection;
             bindingRepository = new BindingRepository(new IntIdGenerator());
 
-            if (baseScheduler is IDisposable)
+            if (baseScheduler is IDisposable disposable)
             {
-                disposables.Add(baseScheduler as IDisposable);
+                disposables.Add(disposable);
             }
 
             // ReSharper disable once InvokeAsExtensionMethod
             var baseMessages = Observable.ObserveOn(connection, baseScheduler);
             callbackExecutor = new CallbackExecutor<TMarshal>(new IntIdGenerator(),
-                () => connection.IsOpen,
+                connection,
                 baseMessages.Select(m => m.CallbackResult)
                     .Where(m => m != null));
             var callbackFactory = new CallbackFactory<TMarshal>(callbackExecutor);
