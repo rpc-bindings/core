@@ -83,6 +83,8 @@ namespace DSerfozo.RpcBindings
                 .Select(m => m.DynamicObjectRequest)
                 .Where(m => m != null)
                 .Subscribe(OnDyanmicObjectRequest));
+
+            disposables.Add(connection);
         }
 
         private void OnDyanmicObjectRequest(DynamicObjectRequest dynamicObjectRequest)

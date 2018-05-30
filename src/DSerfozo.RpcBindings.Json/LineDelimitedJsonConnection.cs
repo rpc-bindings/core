@@ -87,5 +87,9 @@ namespace DSerfozo.RpcBindings.Json
                 rpcResponseSubject.OnNext(response);
             }
         }
+
+        public void Dispose()
+        {
+        }
     }
 }
