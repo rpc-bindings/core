@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Modifications Copyright 2017 David Serfozo
+
 using System.IO;
 
 namespace DSerfozo.RpcBindings.Castle.Core.Logging

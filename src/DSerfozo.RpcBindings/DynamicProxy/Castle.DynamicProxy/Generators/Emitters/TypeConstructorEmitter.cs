@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Modifications Copyright 2017 David Serfozo
+
 using DSerfozo.RpcBindings.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
 namespace DSerfozo.RpcBindings.Castle.DynamicProxy.Generators.Emitters
