@@ -46,6 +46,10 @@ namespace DSerfozo.RpcBindings.Tests
             {
                 OutgoingSubject.OnNext(rpcRequest);
             }
+
+            public void Dispose()
+            {
+            }
         }
 
         [Fact]

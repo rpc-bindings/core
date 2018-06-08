@@ -7,51 +7,18 @@ environment:
   npm_key:
     secure: uz70X1rDufUiuaV59aw5GKHF6lLvRCe9QkBZQkjGaxwAP/LSuVHdRAdEwRIZhkai
 install:
-- ps: Install-Product node $env:nodejs_version
 - git submodule update --init --recursive
 - cmd: >-
-    cd src\dserfozo-rpcbindings
-
-    npm install
-
-    npm run set-buildnum %APPVEYOR_BUILD_NUMBER%
-
-    npm run build
-
-    cd ..\..
-
-
-    cd tests\DSerfozo.RpcBindings.Node.IntegrationTests
-
-    npm install
-
-    cd ..\..
-
-
     dotnet restore
 build_script:
 - cmd: msbuild DSerfozo.RpcBindings.sln /t:Build;Pack /p:Configuration=Release /p:BuildNumber=%APPVEYOR_BUILD_NUMBER% /p:ProjectOutputPath=%cd%\dist
-- cmd: cd src\dserfozo-rpcbindings && npm pack
 test_script:
-- cmd: 'cd src\dserfozo-rpcbindings && npm run test'
 - cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Tests\bin\Release\net461\DSerfozo.RpcBindings.Tests.dll'  
-- cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Json.Tests\bin\Release\net461\DSerfozo.RpcBindings.Json.Tests.dll'
-- cmd: '%xunit20%\xunit.console.x86 tests\DSerfozo.RpcBindings.Node.IntegrationTests\bin\Release\net461\DSerfozo.RpcBindings.Node.IntegrationTests.dll'
 artifacts:
 - path: src\DSerfozo.RpcBindings\bin\Release\DSerfozo.RpcBindings*.nupkg
-- path: src\DSerfozo.RpcBindings.Json\bin\Release\DSerfozo.RpcBindings.Json*.nupkg
-- path: src\DSerfozo.RpcBindings.CefGlue\bin\Release\DSerfozo.RpcBindings.CefGlue*.nupkg
-- path: src\dserfozo-rpcbindings\dserfozo-rpcbindings-*.tgz
 deploy:
 - provider: NuGet
   server: https://www.myget.org/F/dserfozo/api/v2/package
   api_key:
     secure: uz70X1rDufUiuaV59aw5GKHF6lLvRCe9QkBZQkjGaxwAP/LSuVHdRAdEwRIZhkai
   skip_symbols: true
-deploy_script:
-  - ps: |
-        pushd src\dserfozo-rpcbindings
-        "//www.myget.org/F/dserfozo/npm/:_authToken=`$`{npm_key`}" | Out-File (Join-Path $ENV:APPVEYOR_BUILD_FOLDER ".npmrc") -Encoding UTF8
-        iex "npm publish"
-    on:
-      branch: master  
