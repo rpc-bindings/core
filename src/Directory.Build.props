@@ -1,5 +1,5 @@
 <Project>
-  <Import Project="version.props" />
+  <Import Project="..\common\build\version.props" />
 
   <PropertyGroup>
     <Product>DSerfozo.RpcBindings</Product>
