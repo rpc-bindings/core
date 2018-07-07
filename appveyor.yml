@@ -2,10 +2,6 @@ version: 0.1.{build}
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
-environment:
-  nodejs_version: 8
-  npm_key:
-    secure: uz70X1rDufUiuaV59aw5GKHF6lLvRCe9QkBZQkjGaxwAP/LSuVHdRAdEwRIZhkai
 install:
 - git submodule update --init --recursive
 - cmd: >-
